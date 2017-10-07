@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+<window id="winventalinea" 
+        title="Venta" 
+        border="normal"
+        width="650px"
+        height="660px"
+        mode="modal"
+        maximizable="true"
+        closable="true"
+
+        apply="org.zkoss.bind.BindComposer"
+        viewModel="@id('vm') @init('com.clinica.veterinaria.ventas_linea.VentaLineaViewModel')"
+        validationMessages="@id('vmsgs')"  
+>
+         
+    <zscript>
+        import java.util.Map;
+        import org.zkoss.zk.ui.Executions;
+
+
+        public void buscarCliente(){ 
+            Executions.createComponents("/ventas/venta-buscarcliente.zul", null, null);
+        }
+
+        public void agregar(){
+            Map map = new HashMap();
+            map.put("selectedVenta", vm.selectedVenta);
+            if(checkServicio.isChecked())
+                Executions.createComponents("/ventas/venta-buscarservicio.zul", null, map);
+            else
+                Executions.createComponents("/ventas/venta-buscarproducto.zul", null, map);
+        }
+        public void verModificar(){
+            ventana.setVisible(true);
+        }
+    </zscript>
+        
+    <vlayout>
+    <menubar >
+
+        <menuitem label="Guardar"
+                  image="images/guardar.png"
+                  onClick="@command('guardar')"   />
+
+        <menuitem label="Imprimir"
+                  image="images/Print.png"
+                  onClick="@command('imprimir')"
+                  disabled="@bind(not vm.readyToPrint)" />
+
+    </menubar>
+    
+    <hlayout>
+        <groupbox form="@id('zk_venta') 
+                        @load(vm.selectedVenta)
+                        @save(vm.selectedVenta, before='guardar')"
+                  closable="false" hflex="10">
+            
+            <!-- vm.selectedEvent.venta.cliente.nombre ? vm.selectedEvent.venta.id : vm.selectedVenta.id -->
+            <caption label="${vm.getTitulo()}" />
+            
+            <hbox style="margin-bottom:10px">
+            Cliente:
+            <bandbox value="@bind(zk_venta.cliente.fullname)" onOpen="buscarCliente()"  autodrop="false"   cols="25"  width="220px" style="margin-left:15px; margin-right: 75px" readonly="true"  />
+            Fecha:  
+            <datebox value="@bind(zk_venta.fecha)" cols="20" format="dd/MM/yyyy" style="margin-right:10px;" readonly="true"     />
+            </hbox>    
+            
+            Condición:
+            <combobox readonly="true"  onSelect="@command('seleccionar', cmp=self.value)" onCreate="self.setSelectedIndex(vm.indexDeudor())" ><!-- model=""  onAfterRender="self.selectedIndex(0)"  -->
+                <comboitem label="A Cuenta"  />
+                <comboitem label="Contado"   />
+            </combobox>            
+        </groupbox>
+    </hlayout>    
+    </vlayout>
+    
+    
+    <!-- form="@id('zk_ventalinea')   @load(vm.selectedEvent)    @save(vm.selectedEvent, before='update' @validator(vm.validarCantidad)")   -->
+    
+    <vlayout>
+    <hlayout >
+        
+    <panel  width="200px"  height="40px"    style="float:left; margin-left: 0px" border="normal">
+        <caption iconSclass="z-icon-plus" label="Agregar"/>        
+    </panel>
+    <hbox>
+        <bandbox id="banda"
+                 autodrop="false"
+                 cols="25" style="margin-left:11px; margin-right: 10px; margin-top:5px"
+                 value=""
+                 placeholder="Código"
+                 onOpen="agregar()"
+                 onOK="@command('agregarProducto', band=banda)"  />
+
+        <checkbox id="checkServicio" label="Servicio" onCheck="" />	  
+    </hbox>
+       
+    </hlayout>
+    </vlayout> 
+    
+        <window id="ventana" visible="@bind(not empty vm.selectedEvent)"
+                form="@id('zk_ventalinea') 
+                      @load(vm.selectedEvent)
+                      @save(vm.selectedEvent, before='guardar')"
+                mode="popup"
+                position="center,center" 
+                border="normal"  width="350px" height="100px"   > <!--style="float:left; margin-left: 5px" hflex="10" @bind(not empty vm.selectedEvent) -->
+            <panel >
+            <caption iconSclass="z-icon-tags" label="@bind(zk_ventalinea.item.nombre)"/>
+            <panelchildren>
+                 <hbox >
+                     <!--label value="Nombre"       style="margin-left: 8px;"/-->
+                     <label value="Cantidad"        style="margin-left: 2px;"/>
+                     <label value="Precio"          style="margin-left: 60px;" />
+                    <!--label value="Quitar"       style="margin-left: 68px;"/-->
+                 </hbox>
+                 <hbox>	
+                    <!--textbox value="@bind(zk_ventalinea.item.nombre)"
+                             id="nombreArticulo" 
+                             cols="18" width="180px" style="margin-left: 8px; padding-top 10px;"  
+                             readonly="true"/-->
+
+                    <doublebox  value="@bind(vm.selectedEvent.cantidad)"
+                                id="cantidadArticulo" format="#,##0.##" locale="en"
+                                width="100px" style="margin-left: 2px; margin-right: 15px"
+                                onOK="@command('update')"
+                                /> <!-- errorMessage="@load(vmsgs.cantidad)" -->
+
+                    <doublebox  value="@bind(vm.selectedEvent.pvp)"
+                                id="pvpArticulo" locale="en"
+                                width="100px"  format="#,##0.##"
+                                onOK="@command('update')"/>
+
+                    <button label="Quitar"
+                            id="delete"
+                            width="100px" style="margin-left: 9px;"   image="/images/delete.png"
+                            onClick="@command('delete')"
+                            disabled="@bind(empty vm.selectedEvent)" />        
+                 </hbox>
+            </panelchildren>
+            </panel>
+        </window>
+
+     
+    
+    
+    <hlayout>
+    <listbox model="@load(vm.ventalineas)"
+             selectedItem="@bind(vm.selectedEvent)"
+             id="box"  hflex="10"   mold="paging"  pageSize="10"  rows="10"         >
+        
+        <listhead>
+            <listheader label="Código"       width="100px"/>
+            <listheader label="Detalle"     />
+            <listheader label="Cantidad"    width="60px" align="right"/>
+            <listheader label="Precio"      width="100px" align="right"/>
+            <listheader label="Importe"     width="120px" align="right" />
+        </listhead>
+
+        <template name="model" var="zk_ventalinea">
+            <listitem value="@load(zk_ventalinea)" onDoubleClick="verModificar()">
+                <listcell label="@load(zk_ventalinea.codigo)" />
+                <listcell label="@load(zk_ventalinea.detalle)" />
+                <listcell label="@load(zk_ventalinea.cantidad)" />
+                <listcell label="@load(zk_ventalinea.pvp)           @converter('formatedNumber', format='$ #,##0.00')" />
+                <listcell label="@load(zk_ventalinea.monto)         @converter('formatedNumber', format='$ #,##0.00')" />
+            </listitem>
+        </template>
+    </listbox>
+
+    </hlayout>
+    
+    <hbox  style="float: right;">
+
+        <groupbox closable="false"  width="260px"   height="50px"   >
+            <label value="Total:"   style="font-size: 30px;  margin-top: 10px;" />
+            <doublebox value="@load(vm.costeventalineas)" format="$ #,##0.##" style="font-size: 25px; float: right; text-align: right;" height="35px" width="150px" readonly="true"  />
+        </groupbox>
+
+    </hbox>
+    
+
+
+</window>
+</zk>

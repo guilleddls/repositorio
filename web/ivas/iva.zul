@@ -1,0 +1,152 @@
+  <div  apply="org.zkoss.bind.BindComposer"
+        viewModel="@id('vm') @init('app.iva.IvaViewModel')"
+    >
+
+        <vlayout spacing="0" hflex="1">  
+                 <!-- INDICE DE ARRIBA -->            
+            <div sclass="breadcrumbs">
+                <div sclass="breadcrumb">
+                    <span sclass="home-heart z-icon-usd"/>
+                    <a label="IVA" href="#"/>
+                    <label value="@load(vm.titulo)"/>
+                </div>
+                <!-- Search input-->
+                <include src="/content/search.zul"/>
+            </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <div sclass="page-header">
+                <label value="IVA"/>
+                <a label="@load(vm.titulo)" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div>
+            
+            <div style="margin-bottom:10px; margin-top: 10px">
+                <label value="A partir del Año: " /> 
+                <intbox 
+                    id="bnxYear"
+                    onOK="@command('doSearch')"
+                    value="@bind(vm.filterYear)"
+                    cols="25"
+                    constraint="/^19[0-9]{2}|2[0-9]{3}$/: Debe introducir un año desde 1900 a 2999"
+                    focus="true" />
+                <button id="btnBuscar" class="btn btn-primary" iconSclass="z-icon-search" label="Buscar" onClick="@command('doSearch')" />
+            </div>
+        
+        <hlayout>
+        
+        <menubar id="menu" hflex="10" >
+            <menuitem
+                image="images/nuevo.png"
+                label="Nuevo"
+                tooltiptext="Nueva factura de Iva"
+                onClick="@command('nuevoIva', venta=true)"
+            >
+                
+            </menuitem>
+            
+            <menuitem 
+                      image="images/modificar.png"
+                      label="Modificar"
+                      disabled="@load(empty vm.selectedEvent)"
+                      tooltiptext="Modificar Iva"
+                      onClick="@command('modificarIva')"
+            />
+            
+            <menuitem 
+                      image="images/delete.png"
+                      label="Eliminar"
+                      disabled="@load(empty vm.selectedEvent)"
+                      tooltiptext="Eliminar"
+                      onClick="@command('deleteIva')"
+            />    
+            
+        </menubar>
+        </hlayout>
+        <hlayout hflex="10">
+        <listbox id="box"
+                 mold="paging"
+                 pageSize="9"
+                 rows="9"
+                 multiple="false"
+                 model="@bind(vm.listEvent)"
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 emptyMessage="Ninguna factura encontrada">
+            <listhead>
+                <listheader label="Fecha"           sort="auto(fecha)"              align="center"      width="100px"/>
+                <listheader label="Tipo"            sort="auto(tipo)"               align="center"      width="40px"/>
+                <listheader label="Factura"         sort="auto(facturaCodigo)"   align="left"        width="100px"/>
+                <listheader label="Cuit"            sort="auto(cuit)"          align="center"      width="100px"/>
+                <listheader label="Nombre"          sort="auto(persona)"    align="left"        width="180px"/>
+              
+                <listheader label="Neto Gravado"    sort="auto(netogravado)"      align="right"      width="100px"/>
+                <listheader label="IVA 21%"         sort="auto(iva21)"        align="right"       width="100px"/>
+                <listheader label="IVA 10,5%"       sort="auto(iva10)"               align="right"       width="100px"/>
+                <listheader label="IVA 27%"         sort="auto(iva27)"              align="right"       width="100px"/>
+                <listheader label="Total"           sort="auto(total)"              align="right"       width="120px"/>
+            </listhead>
+            <auxhead>
+         
+                <auxheader>
+                    <textbox value="@bind(vm.filterFecha)"    instant="true"
+                             onCreate="@command('doSearch')"
+                             onOK="@command('doSearch')"
+                             width="95%"
+                    />
+                </auxheader>
+                <auxheader> 
+                    <textbox value="@bind(vm.filterTipo)" instant="true" onOK="@command('doSearch')" width="95%"  />
+                </auxheader>
+
+                <auxheader>
+                    <textbox value="@bind(vm.filterCodigo)" instant="true" onOK="@command('doSearch')" width="95%"  />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCUIT)" instant="true" onOK="@command('doSearch')" width="95%"  />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterPersona)" instant="true" onOK="@command('doSearch')" width="95%"  />
+                </auxheader>
+                
+                
+                <auxheader>
+                    <textbox value="@bind(vm.filterGravado)" instant="true" onOK="@command('doSearch')" width="95%"  />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterIva21)" instant="true" onOK="@command('doSearch')" width="95%"  />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterIva10)" instant="true" onOK="@command('doSearch')" width="95%"  />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterIva27)" instant="true" onOK="@command('doSearch')" width="95%"  />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterTotal)" instant="true" onOK="@command('doSearch')" width="95%"  />
+                </auxheader>
+            </auxhead>
+            
+            <template name="model" 
+                      var="zk_iva">
+                <listitem value="@load(zk_iva)" onDoubleClick="@command('modificarIva')">
+               
+                    <listcell label="@load(zk_iva.fecha)"                       context="${zk_iva.id}"/>
+                    <listcell label="@load(zk_iva.tipo) "          		context="${zk_iva.id}"/>
+                    <listcell label="@load(zk_iva.facturaCodigo)"               context="${zk_iva.id}"/>
+                    <listcell label="@load(zk_iva.cuit)"          		context="${zk_iva.id}"/>
+                    <listcell label="@load(zk_iva.persona)"                     context="${zk_iva.id}"/>
+                    <listcell label="@load(zk_iva.netogravado)         @converter('formatedNumber', format='$ #,##0.00')"   context="${zk_iva.id}"/>
+                    <listcell label="@load(zk_iva.iva21)               @converter('formatedNumber', format='$ #,##0.00')"   context="${zk_iva.id}"/>
+                    <listcell label="@load(zk_iva.iva10)               @converter('formatedNumber', format='$ #,##0.00')"   context="${zk_iva.id}"/>
+                    <listcell label="@load(zk_iva.iva27)               @converter('formatedNumber', format='$ #,##0.00')"   context="${zk_iva.id}"/>
+                    <listcell label="@load(zk_iva.total)               @converter('formatedNumber', format='$ #,##0.00')"   context="${zk_iva.id}"/> 
+                </listitem>
+            </template>
+            
+            
+        </listbox>
+        </hlayout>
+        </vlayout>
+        </vlayout>
+</div>
+

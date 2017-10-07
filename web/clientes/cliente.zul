@@ -1,0 +1,406 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win"  
+            border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.clientes.ClienteDatosVM')"
+            visible="false"
+            minimizable="false" 
+            width="900px"
+            height="650px"
+            maximizable="true"
+            mode="modal"  
+            closable="true" 
+            action="hide: slideUp"
+            validationMessages="@id('vmsgs')"
+            >
+         
+        
+        <script type="text/javascript">
+            zk.afterMount(function() {
+                
+                jq("$txtCUIT").mask("99-99999999-9");
+            });
+        </script>
+        
+        <zscript>
+            <![CDATA[
+                import com.clinica.veterinaria.user.UserCredentialManager;
+                import org.zkoss.zk.ui.Executions;
+                import org.zkoss.zk.ui.Sessions;
+
+                
+                win.setTitle("Perfil Cliente - "+ vm.selectedEvent.getNombre()+" "+vm.selectedEvent.getApellidos());
+                
+               
+                boolean mod = false;
+                String image = "images/modificar.png";
+                String modificar = "Modificar";
+                
+                boolean sacarParaPapa = UserCredentialManager.getIntance(Sessions.getCurrent()).getRol() == 1;
+               
+
+                if(!UserCredentialManager.getIntance(Sessions.getCurrent()).isAuthenticated())
+                    Executions.sendRedirect("index.zul");
+                else{
+                    win.setVisible(true);
+                }
+            ]]>
+        </zscript>
+       
+        <tabbox id="tabBoxCustomer" hflex="10" >
+            <tabs>
+                <tab id="tabDatos" label="Datos" iconSclass="z-icon-folder-open"/>
+                <tab id="tabMascotas" label="Mascotas"  iconSclass="z-icon-paw" visible="${sacarParaPapa}"/>
+                <tab id="tabCitas" label="Citas" visible="${sacarParaPapa}" />
+                <tab id="tabVentas" label="Ventas" iconSclass="z-icon-usd" visible="${sacarParaPapa}"/>
+            </tabs>
+            <tabpanels>
+                <tabpanel id="datosCliente"  
+                          height="570px"
+                          form="@id('zk_cliente') 
+                                @load(vm.selectedEvent) 
+                                @save(vm.selectedEvent, before='actualizar')
+                                @validator(vm.dateValidator)"
+                                
+                                >
+                    <menubar id="menuCli" >
+                        <menuitem id="modificarDatos" label="Modificar" image="images/modificar.png"  onClick="@command('modificar')">
+                            
+                        </menuitem>
+                        <menuitem id="cancelarDatos" label="Cancelar" onClick="@command('cancelar')" image="images/delete_1.png" visible="false">
+                            
+                        </menuitem>
+                        <menuitem id="updateDatos"  label="Guardar" image="images/guardar.png"  onClick="@command('actualizar')" disabled="true"  >
+                                
+                        </menuitem>
+                    </menubar>
+         <vlayout>
+            <hlayout>         
+                    <panel  style="float: left; padding-right: 20px" hflex="10">
+                        <panelchildren>
+                           
+                            <groupbox form="@id('zk_cliente') @bind(vm.selectedEvent)" mold="3d" closable="false" >
+                                <caption label="Datos del Cliente" image="/images/book_addresses.png"  />
+                                
+                                <grid id="Direccion">
+                                    <columns>
+                                        <column align="right" width="150px" />
+                                        <column width="100%" />
+                                    </columns>
+                                    <rows>
+                                        <row>
+                                            <label value="CUIT" width="150px" />
+                                            <textbox  cols="25" value="@load(zk_cliente.nif)" width="200px" readonly="true" />
+                                        </row>
+                                        <row>
+                                            <label value="Nombre" width="150px" />
+                                            <textbox cols="25" value="@load(zk_cliente.nombre)" width="200px" readonly="true" />
+                                        </row>
+                                        <row>
+                                            <label value="Apellidos" width="150px" />
+                                            <textbox cols="25" value="@load(zk_cliente.apellidos)" width="200px" readonly="true" />
+                                        </row>
+                                        <row>
+                                            <label value="Direccion" width="150px" />
+                                            <textbox cols="25" value="@load(zk_cliente.direccion)" width="200px" readonly="true" />
+                                        </row>
+                                        <row>
+                                            <label value="Provincia" width="200px" />
+                                            <textbox cols="25" value="@load(zk_cliente.provincia.provincia)" width="200px" readonly="true"/>
+                                        </row>
+                                        <row>
+                                            <label value="Ciudad" width="200px" /> 
+                                            <textbox cols="25" value="@load(zk_cliente.ciudad.poblacion)" width="200px" readonly="true"/>
+                                        </row>
+                                        <row>
+                                            <label value="Código postal" width="200px" /> 
+                                            <intbox cols="25" value="@load(zk_cliente.codigopostal)" width="200px" readonly="true"/>
+                                        </row>
+                                    </rows>
+                                </grid>
+                                <grid id="DireccionMod" visible="false">
+                                    <columns>
+                                        <column align="right" width="150px" />
+                                        <column width="100%" />
+                                    </columns>
+                                    <rows>
+                                        <row>
+                                            CUIT
+                                            <cell>
+                                            <textbox id="txtCUIT" cols="25" value="@bind(zk_cliente.nif)" width="200px"  errorMessage="@load(vmsgs.nif)"/>
+                                            <label id="labelCUIT" value="" sclass="red"/>
+                                            </cell>
+                                        </row>
+                                        <row>
+                                            Nombre  
+                                            <cell>                                         
+                                            <textbox id="txtNombre" cols="25" value="@bind(zk_cliente.nombre)" width="200px" errorMessage="@load(vmsgs.nombre)" />
+                                            <label id="labelNombre" value="" sclass="red"/>
+                                            </cell>
+                                        </row>
+                                        <row>
+                                            Apellidos
+                                            <cell>
+                                            <textbox id="txtApellidos" cols="25" value="@bind(zk_cliente.apellidos)" width="200px" errorMessage="@load(vmsgs.apellidos)"/>
+                                            <label id="labelApellidos" value="" sclass="red"/>
+                                            </cell>
+                                        </row>
+                                        <row>
+                                            <label value="Direccion" width="150px" />
+                                            <cell>
+                                            <textbox id="txtDireccion"  cols="25" value="@bind(zk_cliente.direccion)" width="200px" errorMessage="@load(vmsgs.direccion)"/>
+                                            <label id="labelDireccion" value="" sclass="red"/>
+                                            </cell>
+                                        </row>
+                                        <row>
+                                            Provincia
+                                            <cell>
+                                            <selectbox id="provincias" 
+                                                      model="@load(vm.provincias)" 
+                                                      selectedItem="@bind(vm.selectedProvincia) 
+                                                                    @bind(zk_cliente.provincia)"  
+                                                      onSelect="@command('onSelectProvincia')" 
+                                                      height="25px"
+                                                      width="200px" >
+                                                <template name="model">
+                                                    <label value="@bind(each.provincia)" /> <!--label="@bind(each.provincia)" />-->
+                                                </template>
+                                                 
+                                            </selectbox>
+                                            <button iconSclass="z-icon-plus"  class="btn btn-primary" onClick='Executions.createComponents("/configuracion/provincia-lista.zul",null,null)'>
+                                                
+                                            </button>
+                                            <label id="labelProvincia" value="" sclass="red"/>
+                                            </cell>
+                                        </row>
+                                        
+                                        <row>
+                                            
+                                        Ciudad
+                                        <cell>
+                                       <selectbox id="poblaciones" 
+                                                  model="@load(vm.allPoblaciones)" 
+                                                  selectedItem="@bind(zk_cliente.ciudad)"  
+                                                  width="200px" 
+                                                  height="25px"
+                                                  >
+                                            <template name="model">
+                                                <label value="@bind(each.poblacion)"/> <!--label="@bind(each.poblacion)" />-->
+                                            </template>
+                                        </selectbox>
+                                        <button iconSclass="z-icon-plus"  class="btn btn-primary" onClick='Executions.createComponents("/configuracion/ciudad.zul",null,null)'/>
+                                         <label id="labelCiudad" value="" sclass="red"/>
+                                        </cell>
+                                        </row>
+                                        <row>
+                                            Código postal 
+                                            <intbox cols="25" value="@bind(zk_cliente.codigopostal)" width="200px" maxlength="5"/>
+                                        </row>
+                                    </rows>
+                                </grid>
+                            </groupbox>
+                        </panelchildren>
+                    </panel>
+            </hlayout>
+            <hlayout>
+                    <panel border="none" style="padding-right:20px"  hflex="10">
+                        <panelchildren>
+                            <groupbox mold="3d" closable="false">
+                                <caption image="/images/contact_email.png" label="Email" />
+
+                                <grid>
+                                    <columns>
+                                        <column align="right" width="150px" />
+                                        <column width="100%" />
+                                    </columns>
+                                    <rows>
+                                        <row>
+                                            <label value="E-mail"/>
+                                            <textbox id="txtEmail"   cols="25" value="@bind(zk_cliente.email)"  width="200px" readonly="true"/> 
+                                            <!-- constraint="/.+@.+\.[a-z]+/: Please enter an e-mail address" -->
+                                        </row>
+                                    </rows>
+                                </grid>
+                            </groupbox>
+                        </panelchildren>
+                    </panel>
+            </hlayout>
+            <hlayout>        
+                    <panel border="none" style="padding-right:20px" hflex="10">
+                        <panelchildren >
+                            <groupbox mold="3d" closable="false" >
+                                <caption  image="/images/telephone.png" label="Teléfono/Fax" />
+
+                                <grid >
+                                    <columns>
+                                        <column align="right" width="150px" />
+                                        <column width="100%" />
+                                    </columns>
+                                    <rows>
+                                       <row>
+                                            <label value="Teléfono"/>
+                                            <intbox id="intTelefono"    cols="25"  value="@bind(zk_cliente.telefono)"  width="200px"     maxlength="9"    readonly="true"/>
+                                        </row>
+                                        <row>
+                                            <label value="Celular"/>
+                                            <intbox id="intTelefono2"    cols="25"    value="@bind(zk_cliente.telefono2)"  maxlength="9"   width="200px"   readonly="true"/>
+
+                                        </row>
+                                    </rows>
+                                </grid>
+                            </groupbox>
+                        </panelchildren>
+                    </panel>
+            </hlayout>
+         </vlayout>
+                </tabpanel>
+                
+                <tabpanel id="mascotasCliente"  
+                          fulfill="tabMascotas.onSelect"  
+                          height="550px" visible="${sacarParaPapa}">
+                    <menubar id="menuMasc" >
+                        <menuitem id="add"      image="images/nuevo.png"     label="Nuevo"       onClick="@command('asignarMascota')" />
+                        <menuseparator />
+                        <menuitem id="ver"      image="images/page_go.png"     label="Ir a"       onClick="@command('showMascota')" disabled="@load(empty vm.selectedMascota)"/>
+                        <menuitem id="delete"   image="images/delete.png"    label="Eliminar"    onClick="@command('deletemasc')" disabled="@load(empty vm.selectedMascota)" >
+                            <attribute name="onClick">
+                                
+                            </attribute>
+                        </menuitem>
+                    </menubar>
+                    <listbox id="mascbox" 
+                             mold="paging" 
+                             pageSize="15" 
+                             rows="15" 
+                             model="@load(vm.mascotas)"
+                             emptyMessage="No registro ninguna Mascota" 
+                             selectedItem="@bind(vm.selectedMascota)" 
+                             height="520px" >
+                        <listhead>
+                            <listheader label="Nº Cod."             sort="auto(chip)" />
+                            <listheader label="Nombre"              sort="auto(nombre)" />
+                            <listheader label="Fecha Nacimiento"    sort="auto(nacimiento)" />
+                            <listheader label="Raza"                sort="auto(raza.raza)" />
+                            <listheader label="Especie"             sort="auto(especie.especie)"  />
+                            <!--<listheader label="Fecha Alta"  sort="auto(fecha_alta)"  width="170px" />-->
+                        </listhead>
+                        <template name="model" var="zk_mascota" >
+                            <listitem value="@load(zk_mascota)" onDoubleClick="@command('showMascota')">
+                                <listcell label="@load(zk_mascota.chip)"      />
+                                <listcell label="@load(zk_mascota.nombre)"     />
+                                <listcell label="@load(zk_mascota.nacimiento) @converter('formatedDate', format='dd/MM/yyyy')" />
+                                <listcell label="@load(zk_mascota.raza.raza)"   />
+                                <listcell label="@load(zk_mascota.especie.especie)" />
+                                <!--<listcell label="@load(zk_mascota.fecha_alta)" />-->
+                            </listitem>
+                        </template>
+                    </listbox>
+                </tabpanel>
+                
+                
+                <tabpanel id="citasCliente" 
+                          fulfill="tabCitas.onSelect" 
+                          height="550px" visible="${sacarParaPapa}">
+                    <menubar id="menuCitas" >
+                        <menuitem id="addcita"      image="images/nuevo.png"     label="Nuevo"     onClick="@command('asignarCita')" />
+                        <menuseparator />
+                        <menuitem id="deletecita"   image="images/delete.png"     label="Eliminar"  onClick="@command('deletecita')"       disabled="@load(empty vm.selectedCita)" >
+                            
+                        </menuitem>
+                        
+                    </menubar>
+                    <listbox id="citasbox" 
+                             multiple="true" 
+                             mold="paging" 
+                             pageSize="14" 
+                             rows="14" 
+                             emptyMessage="No realizó ninguna cita"
+                             model="@bind(vm.citas)" 
+                             selectedItem="@bind(vm.selectedCita)" 
+                             height="520px" >
+                       <listhead>
+                           <listheader label="Número"      sort="auto(id)"     width="70px"     align="center"/>
+                           <listheader label="Nombre"      sort="auto(mascota.nombre)" width="150px"/>
+                           <listheader label="Estado"      sort="auto(estado)" width="120px"    align="center"/>
+                           <listheader label="Fecha"       sort="auto(fecha)"  width="100px"     align="center"/>
+                           <listheader label="Hora"        sort="auto(hora)"   width="100px"     align="center"/>
+                           <listheader label="Tipo"        sort="auto(servicio.nombre)" width="150px"   align="center"/>
+                           <listheader label="Informe"     sort="auto(informe)"/>
+                       </listhead>
+                       <template name="model" var="zk_cita">
+                           <listitem value="@load(zk_cita)" onDoubleClick="@command('modificarCita')" >
+                               
+                                <listcell label="@load(zk_cita.id)" context="${zk_cita.id}">
+                                
+                                    <menupopup id="${zk_cita.id}">
+                                        <menuitem label="Modificar"  src="/images/modificar.png"  onClick="@command('modificarCita')" />
+                                        <menu label="Cambiar estado" src="/images/sync.png" >
+                                            <menupopup>
+                                                <menuitem label="Avisado"  src="/images/telephone.png"  onClick="@command('avisadoCita')" />
+                                                <menuitem label="Acudido"   src="/images/accept.png"    onClick="@command('acudidoCita')"/>
+                                                <menuitem label="Pendiente" src="/images/error.png"     onClick="@command('pendienteCita')" />
+                                                <menuitem label="Cancelar"  src="/images/delete_1.png"  onClick="@command('canceladoCita')" />
+                                            </menupopup>
+                                        </menu>
+                                    </menupopup>
+                                </listcell>
+                               
+                              
+                               <listcell label="@load(zk_cita.mascota.nombre)" context="${zk_cita.id}" />
+                               <listcell label="Cancelado"  if="${zk_cita.estado == '0'}" src="/images/delete_1.png" context="${zk_cita.id}"/> <!-- CANCELADO -->
+                               <listcell label="Acudido"    if="${zk_cita.estado == '1'}" src="/images/accept.png" context="${zk_cita.id}"/> <!-- ACUDIDO -->
+                               <listcell label="Pendiente"  if="${zk_cita.estado == '2'}" src="/images/error.png" context="${zk_cita.id}"/> <!-- PENDIENTE -->
+                               <listcell label="Avisado"    if="${zk_cita.estado == '3'}" src="/images/telephone.png" context="${zk_cita.id}"/> <!-- AVISADO -->
+                               <listcell label="@load(zk_cita.fecha) @converter('formatedDate', format='dd/MM/yyyy')" context="${zk_cita.id}"/>
+                               <listcell label="@load(zk_cita.hora)" context="${zk_cita.id}" />
+                               <listcell label="@load(zk_cita.servicio.nombre)" context="${zk_cita.id}" if="${zk_cita.servicio != null}" />
+                               <listcell label=""  if="${zk_cita.servicio == null}" context="${zk_cita.id}"/>
+                               <listcell label=""  if="${zk_cita.informe == 'null'}" context="${zk_cita.id}"/>
+                               <listcell label="@load(zk_cita.informe)" context="${zk_cita.id}" if="${zk_cita.informe != 'null'}" />
+                           </listitem>
+                       </template>
+                   </listbox>
+                </tabpanel>
+                <tabpanel id="ventasCliente" 
+                          fulfill="tabVentas.onSelect" 
+                          height="550px" visible="${sacarParaPapa}" >
+                    <listbox id="ventasbox" 
+                             mold="paging" 
+                             pageSize="15"
+                             emptyMessage="No realizó ninguna venta" 
+                             rows="15" 
+                             model="@bind(vm.ventas)" 
+                             selectedItem="@bind(vm.selectedVenta)" 
+                             height="520px" >
+                       <listhead>
+                            <listheader label="Número"          sort="auto(id)" width="80px" align="center"/>
+                            <listheader label="Cliente"         sort="auto(cliente.fullname)" />
+                            <listheader label="Fecha"           sort="auto(fecha)" align="center" width="100px"/>
+                            <listheader label="Hora"            sort="auto(hora)"  align="center" width="100px"/>
+                            <listheader label="N. Artículos"    sort="auto(num_articulos)" align="center" width="100px"/>
+                            <listheader label="Vendedor"        sort="auto(vendedor.nombre)" width="160px"/>
+                            <listheader label="Coste total"     sort="auto(coste)" align="right" width="120px"/>
+                        </listhead>
+                        <template name="model" var="zk_venta">
+                            <listitem value="@load(zk_venta)" onDoubleClick="@command('showVentaLinea')">
+                                <listcell label="@load(zk_venta.id)" context="${zk_venta.id}">
+                                    <menupopup id="${zk_venta.id}">
+                                        <menuitem label="Ir a"  src="images/page_go.png"  onClick="@command('showVentaLinea')" />
+                                    </menupopup>
+                                </listcell>
+                                <listcell label="@load(zk_venta.cliente.fullname)"  context="${zk_venta.id}"/>
+                                <listcell label="@load(zk_venta.fecha) @converter('formatedDate', format='dd/MM/yyyy')"             context="${zk_venta.id}"/>
+                                <listcell label="@load(zk_venta.hora) @converter('formatedDate', format='HH:mm')"              context="${zk_venta.id}"/>
+                                <listcell label="@load(zk_venta.num_articulos)"     context="${zk_venta.id}"/>
+                                <listcell label="@load(zk_venta.vendedor.nombre)"   context="${zk_venta.id}"/>
+                                <listcell label="@load(zk_venta.coste) @converter('formatedNumber', format='$ #,##0.00')" context="${zk_venta.id}"/>
+                            </listitem>
+                        </template>
+                    </listbox>
+                </tabpanel>
+            </tabpanels>
+        </tabbox>
+    </window>
+</zk>

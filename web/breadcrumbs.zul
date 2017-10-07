@@ -1,0 +1,9 @@
+<div sclass="breadcrumbs">
+    <div sclass="breadcrumb">
+        <span sclass="home-icon z-icon-home"/>
+        <a label="INICIO" href="#"/>
+        <label value="Dashboard"/>
+    </div>
+    <!-- Search input-->
+    <include src="/content/search.zul"/>
+</div>	

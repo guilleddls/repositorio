@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window id="win" title="Inicio" visible="false" height="660px" border="normal">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+            
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+                    
+                    win.setVisible(true);
+                }
+        </zscript>
+        <style src="/estilos/listbox20h.css"/>
+        <borderlayout id="main"  vflex="true">
+            <north>
+                <include src="${menu}"/>
+            </north>
+            <center border="1">
+                <borderlayout>
+                    <west border="0" vflex="true" hflex="true" width="50%">
+                        <include src="/inicio/alerta-stock-producto.zul" />
+                    </west>
+                    <east border="0" vflex="true" hflex="true" width="50%">
+                        <include src="/inicio/alerta-cita-cliente.zul"   />
+                    </east>
+                </borderlayout>
+            </center>
+
+        </borderlayout>
+    </window>
+</zk>

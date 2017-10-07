@@ -1,0 +1,69 @@
+<div apply="org.zkoss.bind.BindComposer"
+    viewModel="@id('vm') @init('app.calendario.CalendarEditorViewModel')"
+    validationMessages="@id('vmsgs')">
+    
+    <window title="EVENTO DE CALENDARIO" 
+            border="normal" 
+            width="400px"
+            form="@id('fx') 
+                    @load(vm.calendarEvent) 
+                    @save(vm.calendarEvent, before='ok') 
+                    @validator(vm.dateValidator)"
+            allDay="@ref(vm.isAllDay(fx.beginDate,fx.endDate))"
+            mode="popup" 
+            visible="@load(vm.visible)" 
+            position="center,center" >
+        <vlayout hflex="1">
+            <hlayout>
+                Fijar : <checkbox checked="@bind(fx.locked)" />
+                Por Dia: <checkbox checked="@load(allDay)" disabled="true" />
+            </hlayout>
+            <grid hflex='1'>
+                <columns>
+                    <column width="100px" align="right" />
+                    <column />
+                </columns>
+                <rows>
+                    <row>
+                        Empieza:
+                        <div>
+                            <datebox hflex="true" locale="es" timeZone="GMT+0"
+                                format="@load(allDay ? 'MMMM dd, yyyy' : 'MMMM dd, yyyy hh:mm:ss a')"
+                                value="@bind(fx.beginDate)" errorMessage="@load(vmsgs.beginDate)" />
+                        </div>
+                    </row>
+                    <row>
+                        Termina:
+                        <div>
+                            <datebox hflex="true" locale="es" timeZone="GMT+0"
+                                format="@load(allDay ? 'MMMM dd, yyyy' : 'MMMM dd, yyyy hh:mm:ss a')"
+                                value="@bind(fx.endDate)" errorMessage="@load(vmsgs.endDate)"/>
+                        </div>
+                    </row>
+                    <row>
+                        Color:
+                        <hlayout sclass="z-valign-middle">
+                            Borde -
+                            <colorbox value="@bind(fx.headerColor)" height="20px" />
+                            Contenido -
+                            <colorbox value="@bind(fx.contentColor)" height="20px" />
+                        </hlayout>
+         
+                    </row>
+                    <row>
+                        Titulo:
+                        <textbox multiline="true" rows="3" width="97%"
+                            value="@bind(fx.content)" />
+                    </row>
+                    <row>
+                        <cell colspan="2" style="text-align:center;">
+                            <button label="OK" onClick="@command('ok')" width="80px" visible="@load(empty fx.cita.id)"/>
+                            <button label="Cancelar" onClick="@command('cancel')" width="80px" />
+                            <button label="Borrar" onClick="@command('delete')" width="80px" visible="@load(empty fx.cita.id)"/>
+                        </cell>
+                    </row>
+                </rows>
+            </grid>
+        </vlayout>
+    </window>
+</div>

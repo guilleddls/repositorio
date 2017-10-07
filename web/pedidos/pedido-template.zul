@@ -1,0 +1,173 @@
+  
+   <div  apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.pedidos.PedidoViewModel')">
+
+        <vlayout spacing="0" hflex="1">  
+                 <!-- INDICE DE ARRIBA -->            
+            <div sclass="breadcrumbs">
+                <div sclass="breadcrumb">
+                    <span sclass="home-tags z-icon-tags"/>
+                    <a label="Proveedores" href="#"/>
+                    <label value="Listado de Pedidos"/>
+                </div>
+                <!-- Search input-->
+                <include src="/content/search.zul"/>
+            </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <div sclass="page-header">
+                <label value="Proveedores"/>
+                <a label="Busqueda de Pedidos" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div>
+        
+        <hlayout>
+       
+        <menubar id="menu" hflex="10">
+            <menuitem id="add" 
+                      image="images/nuevo.png" 
+                      label="Nuevo" 
+                      onClick="@command('add')" 
+                      tooltiptext="Nuevo"
+                      disabled="@load(empty vm.selectedProveedor)"/>
+            <menuseparator />
+            <menuitem id="delete"  image="images/delete.png" label="Eliminar"  onClick="@command('delete')" disabled="@load(empty vm.selectedEvent)" tooltiptext="Eliminar">
+                
+            </menuitem>
+        </menubar>
+        </hlayout>
+        
+        <hlayout>
+        <groupbox id="mygrp" closable="false"
+                  form="@id('zk_pedido') 
+                        @load(vm.selectedProveedor) 
+                        @save(vm.selectedProveedor, before='update') 
+                        @save(vm.newEvent, before='add')">
+            
+            <div style="margin-bottom:10px; margin-top: 10px">
+                <hlayout>
+                Proveedor: 
+                </hlayout>
+                <hlayout>
+                <bandbox id="bnxProveedor"  
+                                   autodrop="false" 
+                                   cols="25"  
+                                   value="@bind(vm.selectedProveedor.nombre)"   
+                                   
+                                   readonly="true"
+                                   >
+                            <attribute name="onOpen">
+                                <![CDATA[
+                                    import java.util.HashMap;
+                                    import org.zkoss.zk.ui.Component;
+                                    import org.zkoss.zk.ui.Executions;
+                                    //Map map = new HashMap();
+                                    //map.put("selectedProveedor", vm.selectedProveedor);
+                                    Executions.createComponents("pedidos/pedido-buscarproveedor.zul", null, null);
+                                ]]>
+                            </attribute>
+                        </bandbox>
+                </hlayout>
+
+            </div>
+        </groupbox>
+        <listbox id="box" hflex="10"
+                 mold="paging" 
+                 pageSize="9" 
+                 rows="9" 
+                 multiple="true" 
+                 model="@bind(vm.pedidos)" 
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 emptyMessage="Ningún pedido encontrado">
+            <listhead>
+                <listheader label="Número"          sort="auto(id)" width="80px" align="center"/>
+                <listheader label="Fecha"           sort="auto(fecha)"          align="center" width="90px"/>
+                <listheader label="Fecha entrega"   sort="auto(fecha_entrega)"  align="center" width="90px" />
+                <listheader label="Fecha pago"      sort="auto(fecha_pago)"     align="center" width="90px" />
+                <listheader label="Proveedor"       sort="auto(proveedor.nombre)" />
+                <listheader label="Pagado"          sort="auto(pagado)" width="50px" align="center" />
+                <listheader label="Empleado"        sort="auto(empleado.nombre)" width="90px"/>
+                <listheader label="N. Artículos"    sort="auto(num_articulos)" width="80px" align="right" />
+                <listheader label="Coste total"     sort="auto(coste)" align="right" />
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterId)" 
+                             instant="true" 
+                             onCreate="@command('doSearch')"
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFecha)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFechaEntrega)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFechaPago)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterProveedor)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterPagado)"
+                             instant="true"
+                             onChange="@command('doSearch')"
+                             width="95%" />
+                </auxheader>
+                <auxheader/>
+                <auxheader/>
+                <auxheader/>
+            </auxhead>
+            <template name="model" var="zk_pedido">
+                <listitem value="@load(zk_pedido)" onDoubleClick="@command('showPedidoLinea')">
+                    <listcell label="@load(zk_pedido.id)" context="${zk_pedido.id}">
+                        <menupopup id="${zk_pedido.id}">
+                            <menuitem label="Ir a" 
+                                      src="/images/page_go.png"    
+                                      onClick="@command('showPedidoLinea')" />
+                            <menu label="Pagado" src="/images/coins_add.png">
+                                <menupopup>
+                                    <menuitem label="Pagado"   
+                                              src="/images/accept.png"    
+                                              onClick="@command('pagado')"/>
+                                    <menuitem label="Sin pagar" 
+                                              src="/images/error.png"     
+                                              onClick="@command('sinpagar')" />
+                                </menupopup>
+                            </menu>
+                        </menupopup>
+                    </listcell>
+                    <listcell label="@load(zk_pedido.fecha) @converter('formatedDate', format='yyyy-MM-dd')" context="${zk_pedido.id}"/>
+                    <listcell label="@load(zk_pedido.fecha_entrega) @converter('formatedDate', format='yyyy-MM-dd')" context="${zk_pedido.id}"/>
+                    <listcell label="@load(zk_pedido.fecha_pago) @converter('formatedDate', format='yyyy-MM-dd')" context="${zk_pedido.id}"/>
+                    <listcell label="@load(zk_pedido.proveedor.nombre)" context="${zk_pedido.id}"/>
+                    <listcell context="${zk_pedido.id}">
+                        <checkbox label="@load(zk_pedido.pagado ? 'Si' : 'No')" 
+                                  checked="@bind(zk_pedido.pagado)" 
+                                  disabled="true" 
+                                  />
+                    </listcell>
+                    <listcell label="@load(zk_pedido.empleado.nombre)" context="${zk_pedido.id}"/>
+                    <listcell label="@load(zk_pedido.num_articulos)" context="${zk_pedido.id}"/>
+                    <listcell label="@load(zk_pedido.coste) @converter('formatedNumber', format='$ #,##0.00')" context="${zk_pedido.id}"/>
+                </listitem>
+            </template>
+        </listbox>
+        </hlayout>
+        </vlayout>
+        </vlayout>
+   </div>

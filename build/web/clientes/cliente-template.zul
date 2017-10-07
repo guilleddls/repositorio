@@ -1,0 +1,178 @@
+<zk>
+<zscript>
+        <![CDATA[
+        
+            boolean admin = (UserCredentialManager.getIntance(Sessions.getCurrent()).getRol() == 1);
+            
+        ]]>
+           
+    </zscript>    
+<div apply="org.zkoss.bind.BindComposer"
+             viewModel="@id('vm') @init('com.clinica.veterinaria.clientes.ClienteViewModel')"
+         >
+    
+    <vlayout spacing="0" hflex="1">  
+     <!-- INDICE DE ARRIBA -->            
+        <div sclass="breadcrumbs">
+            <div sclass="breadcrumb">
+                <span sclass="home-user z-icon-user"/>
+                <a label="Clientes" href="#"/>
+                <label value="Gestión de Clientes"/>
+            </div>
+            <!-- Search input-->
+            <include src="/content/search.zul"/>
+        </div>
+           
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <div sclass="page-header">
+                <label value="Clientes"/>
+                <a label="Busqueda de Clientes" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div>
+            
+        <hlayout >
+        <menubar id="menu" hflex="10">
+            <menuitem id="add" 
+                      image="images/nuevo.png" 
+                      label="Nuevo" 
+                      onClick='Executions.createComponents("/clientes/cliente-nuevo.zul", null, null)' 
+                      tooltiptext="Nuevo"/>
+            <menuseparator />
+            <menuitem id="delete"  
+                      image="images/delete.png" 
+                      label="Eliminar"  
+                      disabled="@load(empty vm.selectedEvent)" 
+                      tooltiptext="Eliminar"
+                      onClick="@command('delete')">
+                
+            </menuitem>
+            <menuseparator />
+            <menuitem id="datos"
+                      label="Mostrar Datos"    
+                      onClick="@command('showCliente')" 
+                      image="images/page_go.png"
+                      disabled="@load(empty vm.selectedEvent)" >
+            </menuitem>
+
+            <menuitem label="Asignar Mascota"   
+                      onClick="@command('asignarMascota')" 
+                      image="images/adddog.png"
+                      disabled="@load(empty vm.selectedEvent)" visible="${admin}">
+            </menuitem>
+
+            <menuitem label="Asignar Cita"      
+                      onClick="@command('asignarCita')" 
+                      image="images/date_add.png"
+                      disabled="@load(empty vm.selectedEvent)" visible="${admin}">
+            </menuitem>
+            <menuitem label="Cuenta Móvil"      
+                      onClick="@command('showMovil')" 
+                      image="images/mobile.png"
+                      disabled="@load(empty vm.selectedEvent)" visible="${admin}">
+            </menuitem>
+            
+        </menubar>
+        </hlayout>
+        
+      
+        <hlayout>
+        <listbox id="box" 
+                 mold="paging" 
+                 pageSize="10" 
+                 rows="10" 
+                 emptyMessage="Ningún cliente encontrado"
+                 model="@load(vm.clientes)" 
+                 selectedItem="@bind(vm.selectedEvent)"
+        hflex="10">
+            <listhead>
+                <listheader label="CUIT"        sort="auto(nif)"        width="120px"/>
+                <listheader label="Nombre"      sort="auto(nombre)"     width="200px"/>
+                <listheader label="Apellidos"   sort="auto(apellidos)"  width="150px"/>
+                <listheader label="Dirección"   sort="auto(direccion)"  width="150px"/>
+                <listheader label="Ciudad"      sort="auto(ciudad.poblacion)"   width="150px"/>
+                <!--listheader label="CP"          sort="auto(codigopostal)" width="120px"/-->
+                <listheader label="Provincia"   sort="auto(provincia.provincia)" width="120px"/>
+                <listheader label="Teléfono"    sort="auto(telefono)"  width="90px" />
+                <!--listheader label="Celular"  sort="auto(telefono2)" width="90px" /-->
+                <listheader label="Email"       sort="auto(email)" width="125px"/>
+                <!--listheader label="Fecha alta"  sort="auto(fechaalta)" width="120px" /-->
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterDni)" instant="true"  onCreate="@command('doSearch')" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterNombre)" instant="true" onChange="@command('doSearch')"  width="95%"/>
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterApellidos)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterDireccion)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCiudad)" instant="true" onChange="@command('doSearch')"  width="95%"/>
+                </auxheader>
+                <!--auxheader>
+                    <textbox value="@bind(vm.filterCodigopostal)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader-->
+                <auxheader>
+                    <textbox value="@bind(vm.filterProvincia)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterTelefono)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <!--auxheader>
+                    <textbox value="@bind(vm.filterTelefono2)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader-->
+                <auxheader>
+                    <textbox value="@bind(vm.filterEmail)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <!--auxheader>
+                    <textbox value="@bind(vm.filterFechaalta)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader-->
+            </auxhead>
+            <template name="model" var="zk_cliente">
+                <listitem value="@load(zk_cliente)" onDoubleClick="@command('showCliente')">
+
+                    <listcell label="@load(zk_cliente.nif)"  context="${zk_cliente.nif}"> <!--popup="@load(zk_cliente.nif)"-->
+                        <!--<popup id="@load(zk_cliente.nif)" width="auto">
+                            <vlayout>
+                                <toolbarbutton label="Modificar datos cliente" href="cliente.zul?nif=${zk_cliente.nif}" />
+                                <toolbarbutton label="Añadir Mascota" onClick='Executions.sendRedirect("proveedores.zul?nif=49037135P");'/>
+                            </vlayout>
+                        </popup>-->
+                        <menupopup id="${zk_cliente.nif}">
+                            <menuitem label="Mostrar Datos" onClick="@command('showCliente')" src="images/page_go.png"/>
+                            <!-- Obsoleto, pasa al nuevo perfil <menuitem label="Modificar datos cliente" href="cliente-nuevo.zul?nif=${zk_cliente.nif}"  />-->
+                            <!-- Obsoleto, pasa al nuevo perfil <menuitem label="Listar Mascotas"   onClick="@command('showMascotas')" />-->
+                            <menuitem label="Asignar Mascota"   onClick="@command('asignarMascota')"   src="images/adddog.png"/>
+                            <!-- Obsoleto, pasa al nuevo perfil<menuitem label="Listar Citas"      onClick="@command('showCitas')" />-->
+                            <menuitem label="Asignar Cita"      onClick="@command('asignarCita')"     src="images/date_add.png"/>
+                        </menupopup>
+                    </listcell>
+                    <listcell label="@load(zk_cliente.nombre)" context="${zk_cliente.nif}"/>
+                    <listcell label="@load(zk_cliente.apellidos)" context="${zk_cliente.nif}"/>
+                    <listcell label="@load(zk_cliente.direccion)" context="${zk_cliente.nif}"/>
+                    <listcell label="@load(zk_cliente.ciudad.poblacion)" context="${zk_cliente.nif}"/>
+                    <!--listcell label="@load(zk_cliente.codigopostal)" if="${zk_cliente.codigopostal != '0'}" context="${zk_cliente.nif}"/-->
+                    <!--listcell label="" if="${zk_cliente.codigopostal == '0'}" context="${zk_cliente.nif}"/-->
+                    <listcell label="@load(zk_cliente.provincia.provincia)" context="${zk_cliente.nif}"/>
+                    <listcell label="@load(zk_cliente.telefono)" context="${zk_cliente.nif}"/>
+                    <!--listcell label="@load(zk_cliente.telefono2)" if="${zk_cliente.telefono2 != '0'}" context="${zk_cliente.nif}"/-->
+                    <!--listcell label="" if="${zk_cliente.telefono2 == '0'}" context="${zk_cliente.nif}"/-->
+                    <listcell label="@load(zk_cliente.email)" context="${zk_cliente.nif}"/>
+                    <!--listcell label="@load(zk_cliente.fechaalta)" context="${zk_cliente.nif}"/-->
+                    
+                </listitem>
+            </template>
+        </listbox>
+        
+        </hlayout>
+        </vlayout>
+    </vlayout> 
+</div>
+
+        
+
+</zk>

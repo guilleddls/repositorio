@@ -1,0 +1,69 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+    <window id="winbuscarcliente" title="Busqueda de Cliente" border="normal"
+            width="800px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            onCancel="winbuscarcliente.detach()"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.clientes.ClienteViewModel')"
+            validationMessages="@id('vmsgs')">
+        <zscript>
+            enviar(){
+                vm.send(); 
+                winbuscarcliente.detach();
+            }
+            
+            enviarRapido(){
+                vm.sendRapido(); 
+                winbuscarcliente.detach();
+            }
+             
+        </zscript>
+        <menubar id="menu" >
+            <menuitem id="send"  
+                      image="/images/check_box.png"  
+                      label="Enviar"  
+                      disabled="@load(empty vm.selectedEvent)" 
+                      tooltiptext="Enviar" onClick="enviar()"/>
+
+            <menuitem label="Nuevo" tooltiptext="Nuevo Cliente" image="/images/nuevo.png" onClick="rapido.setVisible(true)" />
+            
+        </menubar>
+ 
+        <hlayout >
+
+        <panel  id="rapido" width="200px"  height="40px" style="float:left; margin-left: 0px" border="normal">
+            <caption iconSclass="z-icon-plus" label="Nuevo Cliente"/>
+            
+            <textbox placeholder="Nombre"   cols="25" value="@bind(vm.newEvent.nombre)"         width="200px" />
+            <textbox placeholder="Apellido" cols="25" value="@bind(vm.newEvent.apellidos)"      width="200px" />
+            <button  label="Agregar" width="100px" image="/images/page_go.png"  onClick="enviarRapido()"   /> 
+        </panel>
+        </hlayout>
+
+        <listbox id="box" mold="paging" pageSize="8" multiple="true" rows="8" model="@bind(vm.clientes)" 
+                 selectedItem="@bind(vm.selectedEvent)">
+            <listhead>
+                <!--listheader label="CUIT"      sort="auto(nif)">
+                    <textbox value="@bind(vm.filterDni)" instant="true" onCreate="@command('doSearch')" onChange="@command('doSearch')" width="130px" />
+                </listheader-->
+                <listheader label="Nombre"      sort="auto(nombre)" >
+                    <textbox value="@bind(vm.filterNombre)" instant="true" onChange="@command('doSearch')" onCreate="@command('doSearch')" width="130px" />
+                </listheader>
+                <listheader label="Apellidos"      sort="auto(apellidos)" >
+                    <textbox value="@bind(vm.filterApellidos)" instant="true" onChange="@command('doSearch')" width="130px" />
+                </listheader>
+                <listheader label="Dirección"      sort="auto(ciudad)" >
+                    <textbox value="@bind(vm.filterCiudad)" instant="true" onChange="@command('doSearch')" width="130px" />
+                </listheader>
+            </listhead>
+            <template name="model" var="zk_cliente">
+                <listitem value="@load(zk_cliente)" onDoubleClick="enviar()">
+                    <!--listcell label="@load(zk_cliente.nif)" /-->
+                    <listcell label="@load(zk_cliente.nombre)" />
+                    <listcell label="@load(zk_cliente.apellidos)" />
+                    <listcell label="@load(zk_cliente.ciudad)" />
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>

@@ -1,0 +1,59 @@
+<vlayout spacing="0" >  
+    <!-- INDICE DE ARRIBA -->            
+    <div sclass="breadcrumbs">
+        <div sclass="breadcrumb">
+            <span sclass="home-icon z-icon-home"/>
+            <a label="INICIO" href="#"/>
+            <label value="Página Inicio"/>
+        </div>
+        <!-- Search input-->
+        <include src="/content/search.zul"/>
+    </div>
+
+<vlayout sclass="page-content" xmlns:n="native" spacing="0">
+  
+    <div sclass="page-header">
+        <label value="Menú Principal"/>
+        <a label="Próximas Citas Pendientes &amp; Alerta de Stock bajo" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+    </div>
+    <zscript>
+        String usr_nombre = "Bienvenido " + UserCredentialManager.getIntance(session).getUser().getNombre();
+        java.util.Date fecha = new java.util.Date();
+        String str_date = new java.text.SimpleDateFormat("dd/MM/yyyy").format(fecha);
+    </zscript>
+    <window closable="true" border="normal" sclass="alert alert-success" style="background-color: #93dd95;">
+        <caption iconSclass="z-icon-check">
+            <label value="${usr_nombre}"  /> 
+            <label value="${str_date}" style="font-weight:bold;color:#69AA46" />
+            <label value=" web (v1.0)" style="font-weight:bold;font-size:10px;color:#69AA46"/>
+            , aplicación para la gestión de su veterinaria.
+        </caption>
+    </window>
+  
+  
+  
+  <separator height="12px"/>
+  
+  
+  <hlayout spacing="24px">
+    <include src="content/domain.zul" hflex="10"/>
+    <!--include src="content/saleschart.zul" hflex="5"/-->
+  </hlayout>
+  <separator bar="true"/>
+  <hlayout spacing="24px">
+      <include src="content/stock.zul" hflex="10"/>
+    <!--include src="content/tabbox.zul" hflex="7" style="position: relative;"/-->
+    <!--include src="content/conversation.zul" hflex="6"/-->
+  </hlayout>
+  <separator bar="true"/>
+  
+  <hlayout height="150px">
+      
+  </hlayout>
+  <!--hlayout spacing="24px">
+    <include src="content/infobox.zul" hflex="7"/>
+    <include src="content/piechart.zul" hflex="5"/>
+  </hlayout-->
+</vlayout>
+
+</vlayout>

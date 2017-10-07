@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?page title="Clinica Veterinaria"?>
+
+<?link href="../css/bootstrap.css" rel="stylesheet" type="text/css"?>
+
+<?link href="../css/fonts.css" rel="stylesheet" type="text/css"?>
+<?link href="../estilos/listbox20h.css" rel="stylesheet" type="text/css"?>
+
+<?link href="../css/index.css.dsp" rel="stylesheet" type="text/css"?>
+<?link rel="icon" type="image/x-icon" href="../images/vetico.png"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     
+            
+          
+      <zscript>
+          <![CDATA[
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+            Session s = Sessions.getCurrent();
+            boolean desactivado = true;
+                
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1){ //Si es admin
+                        
+                    }
+                    else
+                        Executions.sendRedirect("../principal.zul");
+                    
+                }
+                ]]>
+        </zscript>
+       
+       <include src="../navbar.zul"/> 
+        
+    <hlayout spacing="0" id="main"
+         apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.user.UserViewModel')">
+        
+        <zscript>
+            String ruta = "..";
+            boolean configs = true;
+            boolean estadisticas = false, mascotas = false, articulos = false, ventas = false, proveedores = false, inicio = false, clientes = false;
+            
+        </zscript>
+        <include src="../sidebar.zul"/>
+   
+   
+
+        <vlayout spacing="0" hflex="1">  
+                 <!-- INDICE DE ARRIBA -->            
+            <div sclass="breadcrumbs">
+                <div sclass="breadcrumb">
+                    <span sclass="home-cog z-icon-cog"/>
+                    <a label="Configuración" href="#"/>
+                    <label value="Usuarios"/>
+                </div>
+                <!-- Search input-->
+                <include src="/content/search.zul"/>
+            </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <div sclass="page-header">
+                <label value="Usuarios"/>
+                <a label="Panel de Usuarios" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div>
+        
+        <hlayout> 
+        <menubar id="menu" hflex="10">
+            <menuitem id="add" image="../images/nuevo.png" label="Nuevo" onClick="@command('nuevoUsuario')" tooltiptext="Nuevo"/>
+            <menuseparator />
+            
+           
+            <menuitem id="delete"  
+                      image="../images/delete.png" 
+                      label="Eliminar" 
+                      disabled="@load(empty vm.selectedEvent)" 
+                      tooltiptext="Eliminar"
+                      onClick="@command('delete')">
+               
+            </menuitem>
+           
+        </menubar>
+        </hlayout>
+        <hlayout>
+        
+        <listbox id="box" 
+                 mold="paging"
+                 rows="9"
+                 pageSize="9" 
+                 model="@load(vm.events)" 
+                 selectedItem="@bind(vm.selectedEvent)">
+            <listhead>
+                <listheader label="Usuario"     sort="auto(user)" />
+                <listheader label="Nombre"      sort="auto(nombre)" />
+                <listheader label="Apellidos"   sort="auto(apellidos)" />
+                <listheader label="CUIT"        sort="auto(nif)"/>
+                <listheader label="Rol"         sort="auto(tipo)" />
+                <listheader label="Dirección"   sort="auto(direccion)" />
+                <listheader label="Localidad"   sort="auto(poblacion.poblacion)" />
+                <listheader label="Provincia"   sort="auto(provincia.provincia)" />
+                <listheader label="Teléfono"    sort="auto(telefono)" />
+                <listheader label="Móvil"       sort="auto(movil)" />
+                <listheader label="Email"       sort="auto(email)" />
+                <!--listheader label="DNI"         sort="auto(nss)" /-->
+                <listheader label="Fecha Alta"  sort="auto(fecha_alta)" />
+            </listhead>
+            <template name="model" var="zk_user">
+                <listitem value="@load(zk_user)" onDoubleClick="@command('modificarUsuario')">
+                    <listcell label="@load(zk_user.user)" />
+                    <listcell label="@load(zk_user.nombre)" />
+                    <listcell label="@load(zk_user.apellidos)" />
+                    <listcell label="@load(zk_user.nif)" />
+                    <listcell label="Administrador" if="${zk_user.tipo == '1'}" />
+                    <listcell label="Veterinario"   if="${zk_user.tipo == '2'}" />
+                    <listcell label="Empleado"      if="${zk_user.tipo == '3'}" />
+                    <listcell label="@load(zk_user.direccion)" />
+                    <listcell label="@load(zk_user.poblacion.poblacion)" />
+                    <listcell label="@load(zk_user.provincia.provincia)" />
+                    <listcell label="@load(zk_user.telefono)" if="${zk_user.telefono != '0'}"/>
+                    <listcell label=""         if="${zk_user.telefono == '0'}" />
+                    <listcell label="@load(zk_user.movil)" if="${zk_user.movil != '0'}"/>
+                    <listcell label=""         if="${zk_user.movil == '0'}" />
+                    <listcell label="@load(zk_user.email)" />
+                    <!--listcell label="@load(zk_user.nss)" /-->
+                    <listcell label="@load(zk_user.fecha_alta)" />
+                </listitem>
+            </template>
+        </listbox>
+        </hlayout>
+        </vlayout>
+        </vlayout>
+    </hlayout>
+</zk>

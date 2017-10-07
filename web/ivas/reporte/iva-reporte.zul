@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Clinica Veterinaria"?>
+<?link rel="icon" type="image/x-icon" href="../../images/vetico.png"?>
+  
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window apply="org.zkoss.bind.BindComposer" 
+            border="normal"
+            title="REPORTE DE IVA"            
+            viewModel="@id('vm') @init('app.iva.IvaReporte')">
+
+    <vlayout  >
+        <hlayout>
+        Tipo Reporte: 
+        <listbox id="format" mold="select"  model="@load(vm.reportTypesModel)"  selectedItem="@bind(vm.reportType)">
+            <template name="model">
+                <listitem value="@load(each)" label="@load(each.label)" />
+            </template>
+        </listbox>
+
+        <radiogroup id="radiogroup" selectedItem="@bind(vm.tipo)" orient="horizontal">
+            <radio id="radioa" label="Venta  " value="venta"/>
+            <radio id="radiob" label="Compra" value="compra"/>
+        </radiogroup>
+        <separator bar="true" orient="vertical" />
+        Mes:
+        <listbox id="mes" mold="select" selectedItem="@bind(vm.month)" height="23px">
+            <listitem label="Enero"         value="1"/>
+            <listitem label="Febrero"       value="2"/>
+            <listitem label="Marzo"         value="3"/>
+            <listitem label="Abril"         value="4"/>
+            <listitem label="Mayo"          value="5"/>
+            <listitem label="Junio"         value="6"/>
+            <listitem label="Julio"         value="7"/>
+            <listitem label="Agosto"        value="8"/>
+            <listitem label="Septiembre"    value="9"/>
+            <listitem label="Octubre"      value="10"/>
+            <listitem label="Noviembre"     value="11"/>
+            <listitem label="Diciembre"     value="12"/>
+        </listbox>
+        Año:
+        <intbox id="year" value="@bind(vm.year)" maxlength="4" width="50px"  />
+        
+        
+        <button label="Ver Reporte" id="boton" onClick="@command('showReport')"  />
+        </hlayout>
+
+    <jasperreport id="report" hflex="10" height="600px" 
+               src="@load(vm.reportConfig.source,     after='showReport')"
+        parameters="@load(vm.reportConfig.parameters, after='showReport')"
+              type="@load(vm.reportConfig.type.value, after='showReport')"
+        datasource="@load(vm.reportConfig.dataSource, after='showReport')"
+    />
+    </vlayout>
+
+</window>
+</zk>
+

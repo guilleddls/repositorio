@@ -1,0 +1,200 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Clinica Veterinaria"?>
+
+<?link href="../css/bootstrap.css" rel="stylesheet" type="text/css"?>
+
+<?link href="../css/fonts.css" rel="stylesheet" type="text/css"?>
+<?link href="../estilos/listbox20h.css" rel="stylesheet" type="text/css"?>
+
+<?link href="../css/index.css.dsp" rel="stylesheet" type="text/css"?>
+<?link rel="icon" type="image/x-icon" href="../images/vetico.png"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+
+            
+        
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+           
+            boolean disabled = true;
+
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            
+
+        </zscript>
+        
+        <include src="../navbar.zul"/> 
+        
+    <hlayout spacing="0" id="main"
+             apply="org.zkoss.bind.BindComposer"
+             viewModel="@id('vm') @init('com.clinica.veterinaria.ventas.VentaViewModel')"
+    >
+        
+        <zscript>
+            String ruta = "..";
+            boolean ventas = true;
+            boolean estadisticas = false, clientes = false, articulos = false, mascotas = false, proveedores = false, inicio = false, configs = false;
+            
+        </zscript>
+        <include src="../sidebar.zul"/>
+   
+   
+
+        <vlayout spacing="0" hflex="1">  
+                 <!-- INDICE DE ARRIBA -->            
+            <div sclass="breadcrumbs">
+                <div sclass="breadcrumb">
+                    <span sclass="home-heart z-icon-usd"/>
+                    <a label="Ventas" href="#"/>
+                    <label value="Listado de Ventas"/>
+                </div>
+                <!-- Search input-->
+                <div sclass="nav-search">
+                    <bandbox placeholder="Buscar ..."  id="busqueda"  sclass="input-prepend"> <attribute name="onOpen"> Executions.getCurrent().sendRedirect("https://www.google.com.ar/#q="+busqueda.getValue(),"_blank");  </attribute> </bandbox>
+                </div>
+            </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <div sclass="page-header">
+                <label value="Ventas"/>
+                <a label="Gestión de Ventas" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div>
+        
+        <hlayout>
+        
+        <menubar id="menu" hflex="10" >
+            <menuitem
+                image="../images/nuevo.png"
+                label="Nuevo"
+                tooltiptext="Nueva Venta"
+                onClick='Executions.createComponents("/ventas/venta-lineas.zul",null,null)'
+            >
+                
+            </menuitem>
+            
+            <menuitem id="delete"
+                      image="../images/delete.png"
+                      label="Eliminar"
+                      disabled="@load(empty vm.selectedEvent)"
+                      tooltiptext="Eliminar Venta"
+                      onClick="@command('delete')"
+            />
+                
+            <menuitem label="Generar Boleta"
+                      image="../images/page_white_text.png"
+                      onClick="@command('crearAlbaran')"
+                      disabled="@load(empty vm.selectedEvent)" 
+                      visible="@load(not empty vm.selectedEvent)"/>
+            <menuitem label="Descargar Boleta"
+                      image="../images/download.png"
+                      onClick="@command('descargarAlbaran')"
+                      disabled="@load(empty vm.selectedEvent)"
+                      visible="@load(not empty vm.selectedEvent)"/>
+        </menubar>
+        </hlayout>
+        <hlayout hflex="10">
+        <listbox id="box"
+                 mold="paging"
+                 pageSize="9"
+                 rows="9"
+                 multiple="false"
+                 model="@bind(vm.ventas)"
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 emptyMessage="Ninguna venta encontrada">
+            <listhead>
+                <listheader label="Fecha"           sort="auto(fecha)"              align="center"      width="100px"/>
+                <listheader label="Hora"            sort="auto(hora)"               align="center"      width="80px"/>
+                <listheader label="Cliente"         sort="auto(cliente.fullname)"   align="left"        width="200px"/>
+                <listheader label="Facturado"       sort="auto(facturado)"          align="center"      width="80px"/>
+                <listheader label="Le atendió"      sort="auto(vendedor.nombre)"    align="left"        width="100px"/>
+                <listheader label="Le sirvió"       sort="auto(veterinario.nombre)" align="left"        width="100px"/>
+                <listheader label="Artículos"       sort="auto(num_articulos)"      align="center"      width="70px"/>
+                <listheader label="Coste"           sort="auto(costesinIva)"        align="right"       width="120px"/>
+                <listheader label="Coste IVA"       sort="auto(ivas)"               align="right"       width="100px"/>
+                <listheader label="Coste total"     sort="auto(coste)"              align="right"       width="140px"/>
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFecha)"
+                             instant="true"
+                             onCreate="@command('doSearch')"
+                             onChange="@command('doSearch')"
+                             width="95%"
+                    />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterHora)"
+                             instant="true"
+                             onChange="@command('doSearch')"
+                             width="95%"
+                    />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCliente)"
+                             instant="true"
+                             onChange="@command('doSearch')"
+                             width="95%"/>
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFacturado)"
+                             instant="true"
+                             onChange="@command('doSearch')"
+                             width="95%"/>
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterEmpleado)"
+                             instant="true"
+                             onChange="@command('doSearch')"
+                             width="95%"/>
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterVeterinario)"
+                             instant="true"
+                             onChange="@command('doSearch')"
+                             width="95%"/>
+                </auxheader>
+                <auxheader/>
+                <auxheader/>
+                <auxheader/>
+                <auxheader/>
+                
+            </auxhead>
+            <template name="model" var="zk_venta">
+                <listitem value="@load(zk_venta)" onDoubleClick="@command('showVentaLinea')">
+                    <!--<listcell label="@load(zk_venta.id)" context="${zk_venta.id}"/>-->
+                    <listcell label="@load(zk_venta.fecha)"             context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.hora) @converter('formatedDate', format='HH:mm') "  context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.cliente.fullname)"  context="${zk_venta.id}" >
+                        <menupopup id="${zk_venta.id}">
+                            <menuitem label="Ir a"
+                                      onClick="@command('showVentaLinea')"
+                                      src="../images/page_go.png" />
+                        </menupopup>
+                    </listcell>
+                    <listcell label="Si" image="../images/accept.png"  if="${zk_venta.facturado eq true}"  context="${zk_venta.id}"        />
+                    <listcell label="No" image="../images/delete.png"  if="${zk_venta.facturado eq false}" context="${zk_venta.id}"       />
+                    <listcell label="@load(zk_venta.vendedor.nombre)"       context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.veterinario.nombre)"    context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.num_articulos)"         context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.costesinIva) @converter('formatedNumber', format='$ #,##0.00')" context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.ivas)  @converter('formatedNumber', format='$ #,##0.00')" context="${zk_venta.id}"/>
+                    <listcell label="@load(zk_venta.coste) @converter('formatedNumber', format='$ #,##0.00')" context="${zk_venta.id}"/>
+                </listitem>
+            </template>
+        </listbox>
+        </hlayout>
+        </vlayout>
+        </vlayout>
+    </hlayout>
+    
+</zk>

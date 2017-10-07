@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="wincita" title="Asignar Cita" border="normal"
+            width="600px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.clientes.ClienteCitaVM')"
+            validationMessages="@id('vmsgs')" visible="false">
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            wincita.setTitle("Asignar Cita para : " + vm.selectedEvent.getNombre() +" "+vm.selectedEvent.getApellidos());
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else
+                wincita.setVisible(true);
+        
+        </zscript>         
+        
+        <!--menubar>
+            <menuitem id="add" label="Guardar" image="images/guardar.png"  onClick="@command('sendmascota')"  />
+        </menubar-->
+  
+        <grid id="mygrp"
+              form="@id('zk_cita') 
+                    @load(vm.selectedEvent) 
+                    @save(vm.newEvent, before='sendmascota') 
+                    @validator('com.clinica.veterinaria.citas.CitaValidator')">
+            <columns>
+                <column label="Datos Cita" width="150px" />
+                <column label="" width="425px"/>
+            </columns>
+            <rows>
+                <row>
+                    Mascota *
+                    <cell>
+                    <selectbox id="txtMascota" 
+                               model="@load(vm.mascotas)"
+                               selectedItem="@save(zk_cita.mascota)"                              
+                               width="200px">
+                        <template name="model">
+                            <label value="@bind(each.nombre)" />
+                        </template>
+                    </selectbox>
+                    <label style="color:red" value="@load(vmsgs['mascota'])" />
+                    </cell>
+                </row>
+                <row>
+                    Fecha * <!-- Solo futuro-->
+                    <cell>
+                    <datebox id="dateFecha" 
+                             format="dd/MM/yyyy" 
+                             width="200px" 
+                             constraint="no past, no empty"
+                             value="@save(zk_cita.fecha)" 
+                             onChange="@command('onSelectFecha')" 
+                             >
+                        <attribute name="onChange">
+                            <![CDATA[
+                                vm.setSelectedFecha(self.getValue());
+                            ]]>
+                        </attribute>
+                    </datebox>
+                    <label style="color:red" value="@load(vmsgs['fecha'])" />
+                    </cell>
+                </row>
+                <row>
+                    Hora *
+                    <cell>
+                    <selectbox id="cmbHora" model="@load(vm.horas)"
+                              selectedItem="@save(zk_cita.hora)"  
+                              width="200px">
+                        <template name="model">
+                            <label value="@bind(each)" />
+                        </template>
+                    </selectbox>
+                    <label style="color:red" value="@load(vmsgs['hora'])" />
+                    </cell>
+                </row>
+                <row>
+                    Servicio
+                    <cell>
+                    <selectbox id="txtTipo" 
+                               model="@load(vm.servicios)" 
+                               selectedItem="@save(zk_cita.servicio)"  
+                               width="200px" >
+                        <template name="model">
+                            <label value="@bind(each.nombre)" />
+                        </template>
+                    </selectbox>
+                    <label style="color:red" value="@load(vmsgs['servicio'])" />
+                    </cell>
+                </row>
+                <row>
+                    Informe:
+                    <hlayout>
+                        <textbox id="txtObs" rows="3" width="250px" value="@save(zk_cita.informe)"/>
+                    </hlayout>
+                </row>
+                
+                <row>
+                    <cell colspan="3" style="text-align:center">
+                        <vlayout>
+                                                    
+                            <button class="btn btn-primary" id="add" label="Guardar" onClick="@command('sendmascota', cmp=wincita)"  width="100px" height="30px" image="images/guardar.png" >
+
+                            </button>
+                        </vlayout>
+                    </cell>
+                </row>
+            </rows>
+        </grid>
+    </window>
+</zk>

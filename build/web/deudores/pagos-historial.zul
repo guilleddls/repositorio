@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window
+        title="Historial de Pagos" 
+        border="normal"
+        height="400px"
+        mode="modal"
+        maximizable="true"
+        closable="true"
+        width="600px"
+        apply="org.zkoss.bind.BindComposer"
+        viewModel="@id('vm') @init('app.pagos.PagoViewModel')"
+    >
+        <menubar>
+            <menuitem label="Nuevo"     image="images/modificar.png"    onClick="@command('showPago')"   />
+            <menuitem label="Borrar"    image="images/delete_1.png"     onClick="@command('delete')"     />
+	</menubar>
+        
+        <hlayout>
+            <listbox model="@bind(vm.pagos)"
+                     selectedItem="@bind(vm.selectedEvent)"
+                     mold="paging" 
+                     pageSize="15"
+                     rows="15" 
+                     emptyMessage="No se registraron pagos" 
+                     height="400px" >
+                <listhead>
+                    <listheader label="Número"   sort="auto(id)"                 align="center" width="80px"/>
+                    <listheader label="Fecha"    sort="auto(fecha)"              align="center" width="100px"/>
+                    <listheader label="Saldo"    sort="auto(vendedor.nombre)"                   width="160px"/>
+                </listhead>
+                <template name="model" var="zk_pago">
+                    <listitem value="@load(zk_pago)">
+                        <listcell label="@load(zk_pago.id)"    context="${zk_pago.id}"/>
+                        <listcell label="@load(zk_pago.fecha)       @converter('formatedDate', format='dd/MM/yyyy')"    context="${zk_pago.id}"/>
+                        <listcell label="@load(zk_pago.monto)       @converter('formatedNumber', format='$ #,##0.00')"  context="${zk_pago.id}" style="color: red"/>
+                    </listitem>
+                </template>
+            </listbox>
+	</hlayout>
+    </window>
+</zk>

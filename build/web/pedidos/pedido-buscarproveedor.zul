@@ -1,0 +1,54 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winbuscarprov" title="Buscar Proveedor" border="normal"
+            width="800px" height="auto" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            onCancel="winbuscarprov.detach()"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.proveedores.ProveedorViewModel')"
+            validationMessages="@id('vmsgs')">
+        <zscript>
+            public void funcion(){
+                vm.send(); 
+                winbuscarprov.detach();
+            }
+        </zscript>
+        <menubar id="menu" >
+            <menuitem id="send"  
+                      image="/images/check_box.png"  
+                      label="Enviar"  
+                      disabled="@load(empty vm.selectedEvent)" 
+                      tooltiptext="Enviar">
+                <attribute 
+                    name="onClick">
+                    funcion();
+                </attribute>
+            </menuitem>
+        </menubar>
+        <listbox id="box" mold="paging" 
+                 pageSize="8" 
+                 multiple="true" 
+                 rows="8" 
+                
+                 model="@bind(vm.events)" 
+                 selectedItem="@bind(vm.selectedEvent)">
+            <listhead >
+                <listheader label="CUIT"      sort="auto(nif)" width="200px">
+                    <textbox value="@bind(vm.filterCif)" instant="true" onCreate="@command('doSearch')" onChange="@command('doSearch')" width="85%" />
+                </listheader>
+                <listheader label="Nombre"      sort="auto(nombre)" >
+                    <textbox value="@bind(vm.filterNombre)" instant="true" onChange="@command('doSearch')" width="75%" />
+                </listheader>
+                <listheader label="Provincia"      sort="auto(provincia.provincia)" >
+                    <textbox value="@bind(vm.filterCiudad)" instant="true" onChange="@command('doSearch')" width="75%" />
+                </listheader>
+            </listhead>
+            <template name="model" var="zk_proveedor">
+                <listitem value="@load(zk_proveedor)" onDoubleClick="funcion()" onOK="funcion()">
+                    <listcell label="@load(zk_proveedor.nif)" />
+                    <listcell label="@load(zk_proveedor.nombre)" />
+                    <listcell label="@load(zk_proveedor.provincia.provincia)" />
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+</zk>

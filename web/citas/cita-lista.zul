@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Clinica Veterinaria"?>
+
+<?link href="../css/bootstrap.css" rel="stylesheet" type="text/css"?>
+
+<?link href="../css/fonts.css" rel="stylesheet" type="text/css"?>
+<?link href="../estilos/listbox20h.css" rel="stylesheet" type="text/css"?>
+
+<?link href="../css/index.css.dsp" rel="stylesheet" type="text/css"?>
+<?link rel="icon" type="image/x-icon" href="../images/vetico.png"?>
+<zk xmlns:n="native" >
+   
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            
+            
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            
+        
+        </zscript>
+        
+    <include src="../navbar.zul"/> 
+        
+    <hlayout spacing="0" id="main"
+         apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.citas.CitaViewModel')">
+        
+        <zscript>
+            String ruta = "..";
+            boolean clientes = true;
+            boolean estadisticas = false, mascotas = false, articulos = false, ventas = false, proveedores = false, inicio = false, configs = false;
+            
+        </zscript>
+        <include src="../sidebar.zul"/>
+   
+   
+
+        <vlayout spacing="0" hflex="1">  
+                 <!-- INDICE DE ARRIBA -->            
+            <div sclass="breadcrumbs">
+                <div sclass="breadcrumb">
+                    <span sclass="home-calendar z-icon-calendar"/>
+                    <a label="Citas" href="#"/>
+                    <label value="Gestión de Turnos"/>
+                </div>
+                <!-- Search input-->
+                <include src="/content/search.zul"/>
+            </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <div sclass="page-header">
+                <label value="Citas"/>
+                <a label="Busqueda de Turnos" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div>
+        
+        <hlayout>
+        
+        <menubar id="menu" hflex="10">
+            <menuitem id="add"  
+                      image="../images/nuevo.png" 
+                      label="Nuevo"  
+                    
+
+                      tooltiptext="Nueva Cita"
+                      onClick="@command('nuevaCita')">
+                
+            </menuitem>
+            
+            <menuitem label="Modificar"  
+                      image="../images/modificar.png"  
+                      onClick="@command('modificarCita')" 
+                      tooltiptext="Modificar Cita"
+                      disabled="@load(empty vm.selectedEvent)"/>
+            
+            <menuitem id="delete"  
+                      image="../images/delete.png" 
+                      label="Eliminar"  
+                      disabled="@load(empty vm.selectedEvent)"
+
+                      tooltiptext="Eliminar Cita"
+                      onClick="@command('delete')">
+                
+            </menuitem>
+            <menu label="Cambiar estado" visible="@load(not empty vm.selectedEvent)" image="/images/sync.png">
+                <menupopup>
+                    <menuitem label="Avisado"  image="/images/telephone.png"  onClick="@command('avisadoCita')" />
+                    <menuitem label="Acudido"   image="/images/accept.png"    onClick="@command('acudidoCita')"/>
+                    <menuitem label="Pendiente" image="/images/error.png"     onClick="@command('pendienteCita')" />
+                    <menuitem label="Cancelar"  image="/images/delete_1.png"  onClick="@command('canceladoCita')" />
+                </menupopup>
+            </menu>
+        </menubar>
+        </hlayout>
+        
+        <hlayout>
+        <listbox id="box" 
+                 mold="paging" 
+                 pageSize="10" 
+                 rows="10" 
+                 multiple="true" 
+                 model="@bind(vm.citas)" 
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 emptyMessage="Ninguna cita encontrada">
+            <listhead>
+                <listheader label="Número"      sort="auto(id)"                 width="60px" align="center"/>
+                <listheader label="Fecha"       sort="auto(fecha)"              width="90px" />
+                <listheader label="Hora"        sort="auto(hora)"               width="70px"/>
+                <listheader label="Estado"      sort="auto(estado)"             width="100px"/>
+                <listheader label="Cliente"     sort="auto(cliente.fullname)"   width="200px"/>
+                <listheader label="Mascota"     sort="auto(mascota.nombre)"     width="120px"/>
+                <listheader label="Tipo"        sort="auto(servicio.nombre)"  width="100px"  />
+                <listheader label="Empleado"    sort="auto(empleado.nombre)"           width="100px"/> 
+                <listheader label="Observaciones"     sort="auto(informe)"/>
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterNumero)"  instant="true" onCreate="@command('doSearch')" onChange="@command('doSearch')"  width="95%"/>
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFecha)"  instant="true" onChange="@command('doSearch')"  width="95%"/>
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterHora)"   instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterEstado)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCliente)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterMascota)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterTipo)"    instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterEmpleado)"  instant="true" onChange="@command('doSearch')"  width="95%"/>
+                </auxheader>
+                <auxheader  />
+            </auxhead>
+            <template name="model" var="zk_cita">
+                <listitem value="@load(zk_cita)" onDoubleClick="@command('modificarCita')" >
+                    <listcell label="@load(zk_cita.id)" context="${zk_cita.id}">
+                        <menupopup id="${zk_cita.id}">
+                            <menuitem label="Modificar"  src="/images/modificar.png"  onClick="@command('modificarCita')" />
+                            <menu label="Cambiar estado" >
+                                <menupopup>
+                                    <menuitem label="Avisado"  src="/images/telephone.png"  onClick="@command('avisadoCita')" />
+                                    <menuitem label="Acudido"   src="/images/accept.png"    onClick="@command('acudidoCita')"/>
+                                    <menuitem label="Pendiente" src="/images/error.png"     onClick="@command('pendienteCita')" />
+                                    <menuitem label="Cancelar"  src="/images/delete_1.png"  onClick="@command('canceladoCita')" />
+                                </menupopup>
+                            </menu>
+                        </menupopup>
+                    </listcell>
+                    <listcell label="@load(zk_cita.fecha)"              context="${zk_cita.id}"/>
+                    <listcell label="@load(zk_cita.hora)"               context="${zk_cita.id}"/>
+                    <listcell label="Avisado"    if="${zk_cita.estado == '3'}" src="/images/telephone.png" context="${zk_cita.id}"/> <!-- CANCELADO -->
+                    <listcell label="Cancelado"  if="${zk_cita.estado == '0'}" src="/images/delete_1.png" context="${zk_cita.id}"/> <!-- CANCELADO -->
+                    <listcell label="Acudido"    if="${zk_cita.estado == '1'}" src="/images/accept.png" context="${zk_cita.id}"/> <!-- ACUDIDO -->
+                    <listcell label="Pendiente"  if="${zk_cita.estado == '2'}" src="/images/error.png" context="${zk_cita.id}"/> <!-- PENDIENTE -->
+                    <listcell label="@load(zk_cita.cliente.fullname)"   context="${zk_cita.id}"/>
+                    <listcell label="@load(zk_cita.mascota.nombre)"     context="${zk_cita.id}"/>
+                    <listcell label="@load(zk_cita.servicio.nombre)"  if="${zk_cita.servicio != null}" context="${zk_cita.id}"/>
+                    <listcell label=""  if="${zk_cita.servicio == null}" context="${zk_cita.id}"/>
+                    <listcell label="@load(zk_cita.empleado.nombre)"    context="${zk_cita.id}"/>
+                    <listcell label="@load(zk_cita.informe)"            context="${zk_cita.id}"  if="${zk_cita.informe != 'null'}"/>
+                    <listcell label=""                                  context="${zk_cita.id}"  if="${zk_cita.informe == 'null'}"/>
+                </listitem>
+            </template>
+        </listbox>
+        </hlayout>
+        </vlayout>
+        </vlayout>
+    </hlayout>
+        
+ 
+</zk>

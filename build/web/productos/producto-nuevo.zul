@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns:n="native" >
+     <window id="winproductonuevo" 
+             title="Nuevo Producto" 
+             border="normal"
+             width="580px" 
+             height="auto" 
+             minimizable="false" 
+             maximizable="false"
+             mode="modal"  
+             closable="true" 
+             action="hide: slideUp"
+             apply="org.zkoss.bind.BindComposer"           
+             viewModel="@id('vm') @init('com.clinica.veterinaria.productos.ProductoViewModel')"
+             validationMessages="@id('vmsgs')" 
+             visible="true"
+     >
+
+
+       
+        <grid id="mygrp"
+              form="@id('zk_producto') 
+                    @save(vm.newEvent, before='add') 
+                    @validator('com.clinica.veterinaria.productos.ProductoValidator')">
+            <columns>
+                <column label="" width="100px" align="right"/>
+                <column label="Datos del Producto" width="450px"/>
+            </columns>
+            <rows>
+                <row>
+                    Código
+                    <cell>
+                    <textbox id="txtCodigo" cols="25" value="@bind(zk_producto.codigo)" width="200px" maxlength="20"/>
+                    <label style="color:red" value="@load(vmsgs['codigo'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Nombre<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <textbox id="txtNombre" cols="25" value="@bind(zk_producto.nombre)" width="200px" maxlength="20" constraint="no empty"/>
+                    <label style="color:red" value="@load(vmsgs['nombre'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Categoria<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <selectbox id="cmbFamilia" 
+                              model="@load(vm.familias)" 
+                              selectedItem="@bind(zk_producto.familia)"  
+                              width="200px"
+                    height="25px">
+                        <template name="model">
+                            <label value="@bind(each.nombre)" />
+                        </template>
+                    </selectbox>
+                    <label style="color:red" value="@load(vmsgs['familia'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Proveedor<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <selectbox id="cmbProveedor" 
+                              model="@load(vm.proveedores)"
+                              selectedItem="@bind(zk_producto.proveedor)"
+                              width="200px" 
+                                height="25px">
+                        <template name="model">
+                            <label value="@bind(each.nombre)" />
+                        </template>
+                    </selectbox>
+                    <label style="color:red" value="@load(vmsgs['proveedor'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>IVA<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <selectbox id="cmbIva"
+                              model="@load(vm.ivas)" 
+                              selectedItem="@save(zk_producto.iva)"  
+                              width="200px"
+                    height="25px">
+                        <template name="model">
+                            <label value="@bind(each.valor)" />
+                        </template>
+                    </selectbox>
+                    <label style="color:red" value="@load(vmsgs['iva'])" />
+                    </cell>
+                </row>
+                <row>
+                    P. Costo
+                    <doublebox id="dbxPrecio" 
+                               cols="25" 
+                               value="@bind(zk_producto.precio)" 
+                               width="200px" format="#,##0.##" 
+                    maxlength="7"/>
+                </row>
+                <row>
+                    <cell>Precio<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <doublebox id="dbxPvp"     
+                               cols="25" 
+                               value="@bind(zk_producto.pvp)" 
+                               width="200px" 
+                               format="#,##0.##"
+                               maxlength="7"
+                    />
+                    <label style="color:red" value="@load(vmsgs['pvp'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Stock<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <intbox id="txtStock"      
+                            cols="25" 
+                            value="@bind(zk_producto.stock)" 
+                            width="200px"
+                            
+                            maxlength="5"/>
+                    <label style="color:red" value="@load(vmsgs['stock'])" />
+                    </cell>
+                </row>
+                <row>                  
+                    Imagen                   
+                    <button id="btnImagen"
+                            label="Añadir Imagen"
+                            upload="true,maxsize=8192"
+                            onUpload="@command('uploadFile',upload=event, cmp=imagen)"
+                            
+                            src="images/paperclip.png"
+                            class="btn btn-primary"
+                    >
+                        
+                    
+                    </button>
+                </row>
+                <row>
+                    <label id="img" value=""  />
+                    <image align="center" id="imagen" src="" width="0px"  height="0px"/>
+                </row>
+                <row>
+                    <cell height="50px" colspan="3" style="text-align:center; padding-top:10px; padding-bottom:20px;">
+                        <vlayout>
+                            <button id="add" label="Guardar" onClick="@command('add', cmp=winproductonuevo)"  class="btn btn-primary" width="100px" height="30px" image="images/guardar.png" />
+                       
+                    
+                        </vlayout>
+                    </cell>
+                </row>
+                
+            </rows>
+            
+        </grid>
+        
+    </window>
+</zk>

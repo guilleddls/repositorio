@@ -1,0 +1,56 @@
+<div>
+        <window title="Generar Cuenta App Móvil" 
+            border="normal" 
+            width="400px"
+            form="@id('zk_usuario')
+                    @load(vm.selectedEvent) 
+                    @save(vm.selectedEvent, before='ok') 
+                    @validator(vm.validarMovil)"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.clientes.ClienteViewModel')"
+            validationMessages="@id('vmsgs')"
+            id="winmovil"
+            
+            mode="modal" 
+            visible="true" 
+            position="center,center" >
+            
+        <vlayout hflex="1">
+            
+            <grid hflex='1'>
+                <columns>
+                    <column width="100px" align="right" />
+                    <column />
+                </columns>
+                <rows>
+                    <row>
+                        Usuario:
+                        <div>
+                            <textbox hflex="true" value="@bind(zk_usuario.usuario)" errorMessage="@load(vmsgs.usuario)" />
+                        </div>
+                    </row>
+                    <row>
+                        E-mail:
+                        <div>
+                            <textbox hflex="true"  value="@bind(zk_usuario.email)" errorMessage="@load(vmsgs.email)"/>
+                        </div>
+                    </row>
+                    <row>
+                        Contraseña:
+                        <label value="Generación automatica" />
+                        
+         
+                    </row>
+                    
+                    <row>
+                        <cell colspan="2" style="text-align:center;">
+                            <button id="aceptar" label="OK" onClick="@command('ok' , cmp=winmovil)" width="80px" />
+                            <button id="cancelar" label="Cancelar" onClick="@command('cancel', cmp=winmovil)" width="80px" />
+                            
+                        </cell>
+                    </row>
+                </rows>
+            </grid>
+        </vlayout>
+    </window>
+        </div>

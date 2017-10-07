@@ -1,0 +1,113 @@
+  
+<div 
+         apply="org.zkoss.bind.BindComposer"
+             viewModel="@id('vm') @init('com.clinica.veterinaria.productos.ProductoViewModel')">
+        <vlayout spacing="0" hflex="1">  
+                 <!-- INDICE DE ARRIBA -->            
+            <div sclass="breadcrumbs">
+                <div sclass="breadcrumb">
+                    <span sclass="home-leaf z-icon-leaf"/>
+                    <a label="Articulos" href="#"/>
+                    <label value="Productos"/>
+                </div>
+                <!-- Search input-->
+                <include src="/content/search.zul"/>
+            </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <div sclass="page-header">
+                <label value="Productos"/>
+                <a label="Busqueda de Productos" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div>
+        
+        <hlayout>
+        
+        <menubar id="menu" hflex="10" >
+            <menuitem id="add"
+                      image="images/nuevo.png"
+                      label="Nuevo"
+                      onClick="@command('addproducto')"
+                      tooltiptext="Nuevo"/>
+
+            <menuitem id="delete"  
+                      image="images/delete.png" 
+                      label="Eliminar"  
+                      disabled="@load(empty vm.selectedEvent)" 
+                      visible="@load(not empty vm.selectedEvent)"
+                      tooltiptext="Eliminar"
+                      onClick="@command('delete')">
+                
+            </menuitem>
+        </menubar>
+        </hlayout>
+        
+        <hlayout>
+        <listbox id="box"
+                 mold="paging"
+                 pageSize="10"
+                 rows="10"
+                 multiple="true"
+                 model="@bind(vm.events)"
+                 selectedItem="@bind(vm.selectedEvent)" emptyMessage="Ningún producto encontrado">
+            <listhead>
+                <listheader label="Código"      sort="auto(codigo)"     width="120px"/>
+                <listheader label="Nombre"      sort="auto(nombre)"     width="180px"/>
+                <listheader label="Familia"     sort="auto(familia.nombre)"    width="150px"/>
+                <listheader label="Proveedor"   sort="auto(proveedor.nombre)"  width="180px"/>
+                <listheader label="Fecha Alta"  sort="auto(fecha_alta)" align="center" width="100px"/>
+                <listheader label="Stock"       sort="auto(stock)"      align="center" width="80px"/>
+                <listheader label="IVA %"       sort="auto(iva.valor)"  align="center" width="80px"/>
+                <listheader label="Precio"      sort="auto(precio)"     width="100px"   align="right"/>
+                <listheader label="P.Venta"         sort="auto(pvp)"        width="100px"   align="right"/>
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCodigo)" instant="true" onChange="@command('doSearchProducto')" onCreate="@command('doSearchProducto')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterNombre)" instant="true" onChange="@command('doSearchProducto')"  width="95%"/>
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFamilia)" instant="true" onChange="@command('doSearchProducto')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterProveedor)" instant="true" onChange="@command('doSearchProducto')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFechaalta)" instant="true" onChange="@command('doSearchProducto')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterStock)" instant="true" onChange="@command('doSearchProducto')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterIva)" instant="true" onChange="@command('doSearchProducto')"  width="95%"/>
+                </auxheader>
+                <auxheader/>
+                <auxheader/>
+            </auxhead>
+            <template name="model" var="zk_producto">
+                <listitem value="@load(zk_producto)" onDoubleClick="@command('modificarProducto')" tooltip="${zk_producto.codigo}" >
+                    <listcell label="@load(zk_producto.codigo)" >
+                        <popup id="${zk_producto.codigo}"  if="${zk_producto.fotografia != 'null' and zk_producto.fotografia != NULL}">
+                            
+                            
+                                <image src="@load(zk_producto.fotografia)" width="150px" height="150px"/>
+                            
+                        </popup>
+                    </listcell>
+                    <listcell label="@load(zk_producto.nombre)" />
+                    <listcell label="@load(zk_producto.familia.nombre)" />
+                    <listcell label="@load(zk_producto.proveedor.nombre)" />
+                    <listcell label="@load(zk_producto.fecha_alta)"  />
+                    <listcell label="@load(zk_producto.stock)" />
+                    <listcell label="@load(zk_producto.iva.valor)" />
+                    <listcell label="@load(zk_producto.precio) @converter('formatedNumber', format='$ #,##0.00')"  />
+                    <listcell label="@load(zk_producto.pvp) @converter('formatedNumber', format='$ #,##0.00')" />
+                </listitem>
+            </template>
+        </listbox>
+        </hlayout>
+        </vlayout>
+        </vlayout>
+</div>

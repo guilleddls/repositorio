@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winproveedor" 
+             title="Nuevo Proveedor" 
+             border="normal"
+            width="500px" 
+             height="auto" 
+             minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.proveedores.ProveedorViewModel')"
+            validationMessages="@id('vmsgs')" 
+             visible="false">
+        
+        
+        <script type="text/javascript">
+            <![CDATA[
+            zk.afterMount(function() {
+                
+                jq("$txtCUIT").mask("99-99999999-9");
+            });
+             ]]>
+        </script>
+         
+         <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else{
+                    
+
+                    winproveedor.setVisible(true);
+                }
+
+        </zscript>
+
+       
+
+        
+        <grid id="mygrp"
+              form="@id('zk_proveedor') 
+                    @load(vm.selectedEvent)
+                    @save(vm.newEvent, before='add')
+                    @validator('com.clinica.veterinaria.proveedores.ProveedorValidator')">
+            <columns>
+                <column label="" width="100px" align="right"/>
+                <column label="Datos del Proveedor" width="370px" />
+            </columns>
+            <rows>
+                <row>
+                    <cell>CUIT<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <textbox id="txtCUIT"
+                             cols="25"
+                             value="@bind(zk_proveedor.nif)"
+                             width="195px"
+                            
+                                                        
+                  />
+                        
+                  
+                       
+                    <label style="color:red" value="@load(vmsgs['nif'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Razón Social<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <textbox id="txtNombre"
+                             cols="25"
+                             value="@bind(zk_proveedor.nombre)"
+                             width="195px"
+                              maxlength="25"/>
+                    <label style="color:red" value="@load(vmsgs['nombre'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Dirección<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <textbox id="txtDireccion"
+                             cols="25"
+                             width="195px"
+                             value="@bind(zk_proveedor.direccion)"
+                             maxlength="25"/>
+                    <label style="color:red" value="@load(vmsgs['direccion'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Provincia<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <selectbox id="provincias"
+                              model="@load(vm.provincias)"
+                              selectedItem="@bind(vm.selectedProvincia)
+                                            @bind(zk_proveedor.provincia)"
+                              onSelect="@command('onSelectProvincia')"
+                              width="195px" 
+                                height="25px">
+                        <template name="model">
+                            <label value="@bind(each.provincia)" />
+                        </template>
+                    </selectbox>
+                    <label style="color:red" value="@load(vmsgs['provincia'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Localidad<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <selectbox id="poblaciones"
+                              model="@load(vm.allPoblaciones)"
+                              selectedItem="@bind(zk_proveedor.poblacion)"
+                              width="195px"
+                              height="25px" 
+                    >
+                        <template name="model">
+                            <label value="@bind(each.poblacion)" />
+                        </template>
+                    </selectbox>
+                    <label style="color:red" value="@load(vmsgs['poblacion'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Teléfono<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <longbox id="intTelefono"
+                            cols="25"
+                            width="195px"
+                            value="@bind(zk_proveedor.telefono)"
+                            maxlength="12"
+                            />
+                    <label style="color:red" value="@load(vmsgs['telefono'])" />
+                    </cell>
+                </row>
+                <row>
+                    Celular
+                    <intbox id="intTelefono2"
+                            cols="25"
+                            width="195px"
+                            maxlength="12"
+                            value="@bind(zk_proveedor.telefono2)"
+                            style="margin-right:15px;"
+                    />
+                </row>
+                <row>
+                    Fax
+                    <intbox id="intFax"
+                            cols="25"
+                            width="195px"
+                            maxlength="12"
+                            value="@bind(zk_proveedor.fax)"
+                            style="margin-right:15px;"
+                    />
+                </row>
+                <row>
+                    <cell>E-mail<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <textbox id="txtEmail"
+                             cols="25"
+                             width="195px"
+                             value="@bind(zk_proveedor.email)"
+                             
+                    />
+                    <label style="color:red" value="@load(vmsgs['email'])" />
+                    </cell>
+                </row>
+                <row>
+                    Contacto
+                    <textbox id="txtContacto"
+                             cols="25"
+                             width="195px"
+                             value="@bind(zk_proveedor.contacto)"
+                    />
+                </row>
+                
+                <row>
+                    <cell height="50px" colspan="3" style="text-align:center; padding-top:10px; padding-bottom:20px;">
+                        <vlayout>
+                            <button id="add" label="Guardar" onClick="@command('add', cmp=winproveedor)"  class="btn btn-primary" width="100px" height="30px" image="images/guardar.png" />
+                       
+                    
+                        </vlayout>
+                    </cell>
+                </row>
+                
+            </rows>
+        </grid>
+        
+        
+        
+    </window>
+</zk>

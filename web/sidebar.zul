@@ -1,0 +1,179 @@
+<zk>
+<div id="sidebar" sclass="sidebar" apply="com.clinica.veterinaria.util.SidebarComposer">
+ 
+   
+    
+    <zscript>
+        <![CDATA[
+            import org.zkoss.zk.ui.Executions;
+            import org.zkoss.zk.ui.Path;
+            import org.zkoss.zul.Div;
+        
+            boolean admin = (UserCredentialManager.getIntance(Sessions.getCurrent()).getRol() == 1);
+            boolean veter = (UserCredentialManager.getIntance(Sessions.getCurrent()).getRol() != 2);
+            public void reporte(String ruta_reporte){
+                Executions.getCurrent().sendRedirect(ruta_reporte,"_blank");
+            
+            }
+            
+            
+            
+            //Executions.sendRedirect("/estadisticas/estadistica-mascota.zul")
+            // href="${ruta}/estadisticas/estadistica-mascota.zul"
+            
+            redireccionar(String url, String bookmark){
+                //desktop.setBookmark(bookmark);
+                Div bloque = (Div) Path.getComponent("/contenido");
+                
+                bloque.getChildren().clear();
+                System.gc();
+                Executions.createComponents(url, bloque, null);
+                //Executions.getCurrent().getDesktop().setBookmark(bookmark);
+                Clients.evalJavaScript("changeTheme(\""+bookmark+"\")");
+            }
+            
+            
+        ]]>
+           
+    </zscript>
+    
+    <!-- Shortcuts Button-->
+	<div class="shortcuts">
+		<!-- Display when expanded -->
+		<div class="shortcuts-expanded">
+			<button type="button" class="btn-info" iconSclass="z-icon-signal" popup="popestat" tooltiptext="Estadisticas"  />
+			<button type="button" class="btn-success" iconSclass="z-icon-usd" onClick='Executions.createComponents("/ventas/venta-lineas.zul",null,null)' tooltiptext="Nueva Venta" if="${admin}"/>
+			<button type="button" class="btn-warning" iconSclass="z-icon-group" onClick='redireccionar("/users/user-template.zul","usuarios")' tooltiptext="Usuarios" if="${admin}"/>
+			<button type="button" class="btn-danger" iconSclass="z-icon-cogs" popup="datepp" tooltiptext="Configuración"/>
+		</div>
+		<!-- Display when collapsed -->
+		<div class="shortcuts-collapsed">
+			<button type="button" class="btn-success"/>
+			<button type="button" class="btn-info"/>
+			<button type="button" class="btn-warning"/>
+			<button type="button" class="btn-danger"/>
+		</div>
+                 
+                 <popup id="popestat" width="125px" sclass="date">
+                <listbox>
+                    <listitem label="Mascota"   onClick='redireccionar("/estadisticas/estadistica-mascota.zul","chart-mascotas")' if="${admin}" /> 
+                    <listitem label="Ingresos"  onClick='redireccionar("/estadisticas/estadistica-monetario.zul","chart-movimientos")' if="${admin}"/>
+                    <listitem label="Iva"  onClick='reporte("/ivas/reporte/iva-reporte.zul")' />
+                </listbox>
+              </popup>       
+                         
+                         
+                <popup id="datepp" width="125px" sclass="date">
+                <listbox>
+                    <listitem label="Provincia" onClick='Executions.createComponents("/configuracion/provincia-lista.zul",null,null)'  /> 
+                    <listitem label="Ciudad"    onClick='Executions.createComponents("/configuracion/ciudad.zul",null,null)'/>
+                    <listitem label="Especie"   onClick='Executions.createComponents("/configuracion/especie-nueva.zul",null,null)' if="${admin}"/>
+                    <listitem label="Raza"      onClick='Executions.createComponents("/configuracion/raza-nueva.zul",null,null)' if="${admin}"/>
+                    
+                </listbox>
+              </popup>
+	</div>
+	<!-- Navigation List -->
+	<navbar id="navbar" sclass="nav-list" orient="vertical">
+		
+		<navitem label="Inicio" image="/images/home.png" selected="${marcadores[1]}" id="calitem"  sclass="notify" tooltip="calpp, position=end_center, delay=0" href="principal.zul"/>
+		
+                <nav label="IVA" image="/images/accounting.png" >
+			<navitem id="ivaCompra" label="IVA Venta"  />
+			<navitem id="ivaVenta" label="IVA Compra"   />
+                        <navitem label="Reporte de IVA" onClick='reporte("/ivas/reporte/iva-reporte.zul")' />
+		
+		</nav>
+		
+                <nav label="Clientes" image="/images/people.png" >
+			<navitem label="Gestión de Clientes"    onClick='redireccionar("/clientes/cliente-template.zul","clientes")' selected="${marcadores[2]}"/>
+			<navitem label="Gestión de Citas"       onClick='redireccionar("/citas/cita-template.zul","citas")' selected="${marcadores[3]}" visible="${admin}"/>
+		
+		</nav>
+                
+                <nav label="Proveedores" image="/images/delivery.png"  >
+			<navitem label="Proveedores"    onClick='redireccionar("/proveedores/proveedor-template.zul","proveedores")' selected="${marcadores[10]}"/>
+			<navitem label="Pedidos"        onClick='redireccionar("/pedidos/pedido-template.zul","pedidos")' selected="${marcadores[11]}" visible="${admin}"/>
+
+		</nav>
+                
+                
+                <navitem label="Mascotas" image="/images/mascotas.png"  onClick='redireccionar("/mascotas/mascota-template.zul","mascotas")' visible="${veter}" selected="${marcadores[4]}"/>
+		
+                <navitem label="Calendario" image="/images/date.png"  onClick='redireccionar("/calendario/calendario.zul","calendario")' visible="${veter}" selected="${marcadores[5]}"/>
+		
+                
+                <nav label="Articulos" image="/images/favourites.png" visible="${veter}" >
+			<navitem label="Productos" onClick='redireccionar("/productos/producto-template.zul","productos")' selected="${marcadores[6]}"/>
+			<navitem label="Servicios" onClick='redireccionar("/servicios/servicio-lista.zul","servicios")' selected="${marcadores[7]}"/>
+		</nav>
+		<nav label="Ventas" image="/images/pesos.png" visible="${veter}"  >
+			<navitem label="Gestión de Deudores"  onClick='redireccionar("/deudores/deudores.zul","ventas")' />
+			<navitem label="Gestión de Ventas"  onClick='redireccionar("/ventas/venta-template.zul","ventas")' selected="${marcadores[8]}"/>
+			<navitem label="Facturación"        onClick='redireccionar("/facturas/factura-template.zul","facturas")' selected="${marcadores[9]}"/>
+		</nav>
+		
+		
+		
+		
+                
+                <nav label="Reportes" image="/images/report.png"  visible="${veter}">
+                        
+			<navitem label="Listado de Clientes" onClick='reporte("/clientes/reporte/reporteClientes.zul")' />
+			<navitem label="Listado de Deudores" onClick='reporte("/clientes/reporte/reporteDeudores.zul")' visible="${admin}"/>
+                        <navitem label="Listado de Productos" onClick='reporte("/clientes/reporte/reporteProductos.zul")' visible="${admin}"/>
+		</nav>
+                
+                <nav label="Estadisticas" image="/images/chart.png" visible="${veter}" >
+			<navitem label="Mascotas"        onClick='redireccionar("/estadisticas/estadistica-mascota.zul","chart-mascotas")' selected="${marcadores[12]}"/>
+			<navitem label="Ingresos-Gastos" onClick='redireccionar("/estadisticas/estadistica-monetario.zul","chart-movimientos")' visible="${admin}" selected="${marcadores[13]}"/>
+		</nav>
+                
+		<nav label="Configuración" badgeText="8" image="/images/configs.png" >
+			<navitem src="/images/book_addresses.png"   label="Provincias"  onClick='Executions.createComponents("/configuracion/provincia-lista.zul",null,null)' selected="${configs}" />
+                        <navitem src="/images/book_addresses.png"   label="Ciudades"  onClick='Executions.createComponents("/configuracion/ciudad.zul",null,null)' />
+                        <navitem src="/images/twitter_2.png"   label="Especies"  onClick='Executions.createComponents("/configuracion/especie-nueva.zul",null,null)' visible="${admin}"/>
+                        <navitem src="/images/toucan.png"      label="Razas"     onClick='Executions.createComponents("/configuracion/raza-nueva.zul",null,null)' visible="${admin}"/>
+                        <navitem src="/images/injection.png"   label="Vacunas"   onClick='Executions.createComponents("/configuracion/vacuna-nueva.zul",null,null)' visible="${admin}"/>
+                        <navitem src="/images/brick_add.png"   label="Servicios Familia" onClick='Executions.createComponents("/configuracion/servicio-familia-nuevo.zul",null,null)' visible="${admin}"/>
+                        <navitem src="/images/three_tags.png"  label="Productos Familia"  onClick='Executions.createComponents("/configuracion/producto-familia-nuevo.zul",null,null)' visible="${admin}"/>
+                        <navitem src="/images/coins_add.png"   label="IVAs"      onClick='Executions.createComponents("/configuracion/iva-nuevo.zul",null,null)' visible="${admin}"/>
+                        <navitem src="/images/user.png"        label="Usuarios"  onClick='redireccionar("/users/user-template.zul","usuarios")' visible="${admin}"/>
+		</nav>
+	</navbar>
+	<!-- Toggler -->
+	<div sclass="sidebar-collapse">
+		<a id="toggler" iconSclass="z-icon-angle-double-left"/>
+	</div>
+	<!-- Tooptip for Calender Navitem -->
+	<popup id="calpp" zclass="tooltip" sclass="right tooltip-error cal">
+		<span zclass="tooltip-arrow"/>
+		<label zclass="tooltip-inner" value="5 Eventos Importantes"/>
+	</popup>
+</div>
+
+<script>
+<![CDATA[
+
+$(window).bind("popstate", function(e) {
+    var theme;
+    e = e.originalEvent;
+    if (e.state && (theme = e.state.theme)) {
+    	changeTheme(theme, true);
+    }
+});
+
+function changeTheme(theme, ignore) {
+	
+	
+    if (!ignore) {
+    	if (history.pushState)
+    		history.pushState({theme: theme}, null, '?ref=' + theme);
+    
+    }
+}
+              
+
+]]>
+</script>
+</zk>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul">
+<window 
+    title="Alta de Productos" 
+    border="normal"
+    width="580px" 
+    height="auto"
+    mode="modal"  
+    apply="org.zkoss.bind.BindComposer"   viewModel="@id('vm') @init('com.clinica.veterinaria.productos.ProductoViewModel')"
+
+>
+    <menubar id="menu" hflex="10" >
+        <menuitem label="Cargar" image="../images/nuevo.png" onClick="@command('')" />
+        <menuitem label="Otros" image="../images/delete.png" onClick="@command('')"/>
+
+    </menubar>
+    
+    <groupbox mold="3d" visible="@bind(vm.verAltaMasiva)" >
+        <combobox  id="Proveedores"  readonly="true"/>
+        <combobox  id="Categoria"    readonly="true"/>
+        <doublebox id="Unidad Bolsa" value="1" />  
+        Nombre - Precio
+        <textbox value="@bind(vm.txtAltaMasiva)" rows="10"/>
+    </groupbox>
+    
+    <listbox    mold="paging"
+                pageSize="10"
+                rows="10"
+                multiple="true"
+                model="@bind(vm.events)"
+                selectedItem="@bind(vm.selectedEvent)" 
+                visible="@bind(not vm.verAltaMasiva)">
+        
+        <listhead >
+            <listheader label="Código"      sort="auto(codigo)"     width="120px"/>
+            <listheader label="Nombre"      sort="auto(nombre)"     width="180px"/>
+            <listheader label="Categoria"   sort="auto(familia.nombre)"    width="150px"/>
+            <listheader label="Proveedor"   sort="auto(proveedor.nombre)"  width="180px"/>
+            <listheader label="IVA %"       sort="auto(iva.valor)"  align="center" width="80px"/>
+            <listheader label="Precio"      sort="auto(precio)"     width="100px"   align="right"/>
+            <listheader label="P.Venta"     sort="auto(pvp)"        width="100px"   align="right"/>
+        </listhead>
+
+        <template name="model" var="zk_producto">
+            <listitem value="@load(zk_producto)" >
+                <listcell label="@load(zk_producto.codigo)" />
+                <listcell label="@load(zk_producto.nombre)" />
+                <listcell label="@load(zk_producto.familia.nombre)" />
+                <listcell label="@load(zk_producto.proveedor.nombre)" />
+                <listcell label="@load(zk_producto.iva.valor)" />
+                <listcell label="@load(zk_producto.precio)  @converter('formatedNumber', format='$ #,##0.00')"  />
+                <listcell label="@load(zk_producto.pvp)     @converter('formatedNumber', format='$ #,##0.00')" />
+            </listitem>
+        </template>
+    </listbox>
+</window>
+</zk>

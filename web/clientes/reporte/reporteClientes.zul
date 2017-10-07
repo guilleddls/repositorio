@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Clinica Veterinaria"?>
+<?link rel="icon" type="image/x-icon" href="../../images/vetico.png"?>
+  
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window  apply="org.zkoss.bind.BindComposer" 
+      
+             border="normal"
+             title="REPORTE DE CLIENTES"
+             
+  viewModel="@id('vm') @init('com.reportes.ViewReporteClientes')">
+        
+      <zscript>
+            <![CDATA[
+                import org.zkoss.zk.ui.*;
+                import com.clinica.veterinaria.user.*;
+             
+                void logout() {
+                    s.invalidate();
+                    Executions.sendRedirect("../../index.zul");
+                }
+
+                if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                    Executions.sendRedirect("../../index.zul");
+               
+            ]]>
+        </zscript>  
+        
+        
+
+  <vlayout  >
+      <hlayout>
+        Tipo de archivo : 
+        <listbox id="format" 
+                 mold="select" 
+                 model="@load(vm.reportTypesModel)"
+                 selectedItem="@bind(vm.reportType)">
+        <template name="model">
+            <listitem value="@load(each)" label="@load(each.label)"></listitem>
+        </template>
+        </listbox>
+
+      <button label="Ver Report" id="boton" onClick="@command('showReport')"  />
+      </hlayout>
+   
+
+  
+  
+ 
+    <jasperreport id="report" hflex="10" height="600px" 
+        src="@load(vm.reportConfig.source, after='showReport')"
+        parameters="@load(vm.reportConfig.parameters, after='showReport')"
+        type="@load(vm.reportConfig.type.value, after='showReport')"
+        datasource="@load(vm.reportConfig.dataSource, after='showReport')"/>
+        </vlayout>
+
+</window>
+</zk>

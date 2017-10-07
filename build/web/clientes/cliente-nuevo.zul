@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winclientenuevo" title="Nuevo Cliente" border="normal"
+            width="550px" height="500px" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.clientes.ClienteViewModel')"
+            visible="false"
+            validationMessages="@id('vmsgs')"
+            >
+         
+        
+        <script type="text/javascript">
+            zk.afterMount(function() {
+                
+                jq("$txtCUIT").mask("99-99999999-9");
+            });
+        </script>
+         
+        <zscript>
+            import com.clinica.veterinaria.user.UserCredentialManager;
+            import org.zkoss.zk.ui.Executions;
+            import org.zkoss.zk.ui.Sessions;
+
+         
+
+            if(!UserCredentialManager.getIntance(Sessions.getCurrent()).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else{
+                 winclientenuevo.setVisible(true);
+            }
+        
+        </zscript>         
+
+
+        <grid id="mygrp" form="@id('zk_cliente') 
+                    @load(vm.selectedEvent) 
+                    @save(vm.newEvent, before='add') 
+                    @validator('com.clinica.veterinaria.clientes.ClienteValidator')">
+            <columns>
+                <column label="" width="100px" align="right" />
+                <column label="Datos del Cliente " width="420px" > </column>
+            </columns>
+            <rows>
+                <row>
+                    <cell>CUIT<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <textbox id="txtCUIT"  cols="25" value="@bind(zk_cliente.nif)" width="200px" errorMessage="@load(vmsgs.nif)" />
+                    <label style="color:red" value="@load(vmsgs['nif'])" />
+                    </cell>
+                   
+                </row>
+                <row>
+                    <cell>Nombre<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <textbox id="txtNombre" maxlength="20" value="@bind(zk_cliente.nombre)" width="200px" errorMessage="@load(vmsgs.nombre)" />
+                    <label style="color:red" value="@load(vmsgs['nombre'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Apellido<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <textbox id="txtApellidos" maxlength="20" value="@bind(zk_cliente.apellidos)" width="200px" errorMessage="@load(vmsgs.apellidos)"  />
+                    <label style="color:red" value="@load(vmsgs['apellidos'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Direccion<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <textbox id="txtDireccion"  maxlength="25" value="@bind(zk_cliente.direccion)" width="200px" errorMessage="@load(vmsgs.direccion)" />
+                    <label style="color:red" value="@load(vmsgs['direccion'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Provincia<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <selectbox id="provincias" 
+                               model="@load(vm.provincias)" 
+                               selectedItem="@bind(vm.selectedProvincia) @bind(zk_cliente.provincia)"  
+                               onSelect="@command('onSelectProvincia')" 
+                               width="200px"
+                               height="25px"
+                               >
+                        
+                        <template name="model">
+                            <label value="@bind(each.provincia)" /> <!--label="@bind(each.provincia)" /> -->
+                        </template>
+                    </selectbox>
+                       <button iconSclass="z-icon-plus"  class="btn btn-primary" onClick='Executions.createComponents("/configuracion/provincia-lista.zul",null,null)'/>
+                                         
+                    <label style="color:red" value="@load(vmsgs['provincia'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Ciudad<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <selectbox id="poblaciones" 
+                               model="@load(vm.allPoblaciones)" 
+                               selectedItem="@bind(zk_cliente.ciudad)"  
+                               width="200px"
+                                height="25px">
+                        <template name="model">
+                            <label value="@bind(each.poblacion)"/> <!-- label="@bind(each.poblacion)" /> -->
+                        </template>
+                    </selectbox>
+                       <button iconSclass="z-icon-plus"  class="btn btn-primary" onClick='Executions.createComponents("/configuracion/ciudad.zul",null,null)'/>
+                                         
+                    <label style="color:red" value="@load(vmsgs['poblacion'])" />
+                    </cell>
+                </row>
+                <row>
+                    Código postal
+                    <intbox id="intCodigopostal" cols="25" value="@bind(zk_cliente.codigopostal)" width="200px" maxlength="5" />
+                </row>
+                <row>
+                    Teléfono
+                    <intbox id="intTelefono" cols="25" value="@bind(zk_cliente.telefono)" width="200px"   maxlength="12" />
+                </row>
+                <row>
+                    Celular
+                    <intbox id="intTelefono2" cols="25"  value="@bind(zk_cliente.telefono2)"  width="200px"  maxlength="12" />
+                </row>
+                <row>
+                    E-mail:
+                    <cell>
+                    <textbox id="txtEmail" type="email" cols="25" value="@bind(zk_cliente.email)" width="200px" />
+                             <!--constraint="/.+@.+\.[a-z]+ | \s$/: Por favor, introduzca una dirección de email correcta" />-->
+                    <label style="color:red" value="@load(vmsgs['email'])" />
+                    </cell>
+                </row>
+                <row>
+                   
+                    <cell height="80px" colspan="3" style="text-align:center">
+                        <vlayout>
+                    <button id="add" label="Guardar" onClick="@command('add', cmp=winclientenuevo)"  class="btn btn-primary" width="100px" height="30px" image="images/guardar.png" >
+                       
+                    </button>
+                        </vlayout>
+                    </cell>
+                </row>
+            </rows>
+        </grid>
+        <hlayout>
+            
+            <label style="color:red" value="@load(vmsgs['xxx'])" />
+            <label style="color:green" value="@load(vmsgs['xxxx'])" />
+        </hlayout>
+    </window>
+</zk>

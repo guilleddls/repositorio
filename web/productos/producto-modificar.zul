@@ -1,0 +1,168 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+    <window id="winproductomodificar" border="normal"
+            width="580px" 
+            height="auto" 
+            minimizable="false" 
+            maximizable="false"
+            mode="modal"  
+            closable="true" 
+            action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"          
+            viewModel="@id('vm') @init('com.clinica.veterinaria.productos.ProductoViewModel')"
+            validationMessages="@id('vmsgs')" 
+            visible="true">
+        
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+           
+            
+            winproductomodificar.setTitle("Modificar Producto: " + vm.selectedEvent.getNombre());
+                       
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                winproductomodificar.detach();
+            
+                //Messagebox.show(vm.selectedEvent.getFotografia(), "Mensaje", Messagebox.OK, Messagebox.QUESTION);
+            String path_imagen = vm.selectedEvent.getFotografia();
+            String ancho = "100px";
+            
+            if(path_imagen == null){
+                ancho = "0px"; 
+            }
+        </zscript>
+             
+        
+        <grid id="mygrp"
+              form="@id('zk_producto') 
+                    @load(vm.selectedEvent) 
+                    @save(vm.selectedEvent, before='update')
+                    @validator(vm.validarModificado)">
+            <columns>
+                <column label="" width="100px" align="right"/>
+                <column label="Datos del Producto" width="450px"/>
+            </columns>
+            <rows>
+                <row>
+                    Código
+                    <cell>
+                    <textbox id="txtCodigo" cols="25" value="@bind(zk_producto.codigo)" width="200px" maxlength="20"/>
+                    <label style="color:red" value="@load(vmsgs['codigo'])" />
+                    </cell>
+                </row>
+                <row>
+                    <cell>Nombre<label value="*" style="color:red"/></cell>
+                    <cell>
+                    <textbox id="txtNombre" cols="25" value="@bind(zk_producto.nombre)" width="200px" maxlength="25" constraint="no empty"/>
+                    <label style="color:red" value="@load(vmsgs['nombre'])" />
+                    </cell>
+                </row>
+                
+                <row>
+                    <label value="Categoria" width="150px" />
+                    <textbox id="cmbFamilia" 
+                             value="@load(zk_producto.familia.nombre)" 
+                             cols="25" 
+                             width="195px" 
+                             readonly="true" />
+                </row>
+                <row>
+                    <label value="Proveedor" width="150px" />
+                    <textbox id="cmbProveedor" value="@load(zk_producto.proveedor.nombre)" cols="25" width="195px" readonly="true"/>
+                </row>
+                <row id="rowtxtIva">
+                    <cell>IVA<label value="*" style="color:red"/></cell>
+                    <textbox id="txtbxIva" value="@load(zk_producto.iva.valor)" width="200px"  readonly="true">
+                        <attribute name="onClick">
+                            <![CDATA[
+                            //Messagebox.show(vm.selectedEvent.getIva() + " "+ cmbIva.getModel().getElementAt(0), "Error", Messagebox.OK, Messagebox.ERROR);
+                                   
+                            rowtxtIva.setVisible(false);
+                            rowIva.setVisible(true);
+                            for(int i =0; i< cmbIva.getModel().getSize(); i++){
+                                if(vm.selectedEvent.getIva().equals(cmbIva.getModel().getElementAt(i))){
+                                    cmbIva.setSelectedIndex(i);
+                                    break;
+                                }
+
+                            }
+                            ]]>
+                            
+                            
+                        </attribute>
+                    </textbox>
+                </row>
+                <row id="rowIva" visible="false">
+                    <cell>IVA<label value="*" style="color:red"/></cell>
+                    <selectbox id="cmbIva"
+                              model="@load(vm.ivas)" 
+                              selectedItem="@bind(zk_producto.iva)"  
+                              width="195px"
+                              height="25px">
+                        <template name="model">
+                            <label value="@bind(each.valor)" />
+                        </template>
+                        
+                    </selectbox>
+                </row>
+                <row>
+                    Precio
+                    <doublebox id="dbxPrecio" 
+                               cols="25" 
+                               value="@bind(zk_producto.precio)" 
+                               width="195px" format="#,##0.##" 
+                               constraint="no empty, no zero">
+                    
+                    </doublebox>
+                </row>
+                <row>
+                    <cell>P. Venta<label value="*" style="color:red"/></cell>
+                    <doublebox id="dbxPvp"     
+                               cols="25" 
+                               value="@bind(zk_producto.pvp)" 
+                               width="195px" 
+                               format="#,##0.##"
+                               constraint="no empty, no zero"/>
+                </row>
+                
+                <row>
+                    <cell>Stock<label value="*" style="color:red"/></cell>
+                    <intbox id="txtStock"      
+                            cols="25" 
+                            value="@bind(zk_producto.stock)" 
+                            width="195px"
+                               constraint="no empty, no zero, no negative"/>
+                </row>
+                <row>
+                    Imagen
+                    <button id="btnImagen"
+                            label="Añadir Imagen"
+                            upload="true,maxsize=8192"
+                            onUpload="@command('uploadFile',upload=event, cmp=imagen)"
+                           
+                            src="images/paperclip.png" class="btn btn-primary"/>
+                </row>
+                
+                <row>
+                    <label id="img" value=""  />
+                    <image align="center" id="imagen" src="${path_imagen}" width="${ancho}"  height="{ancho}"/>
+                </row>
+                
+                <row>
+                    <cell height="50px" colspan="3" style="text-align:center; padding-top:10px; padding-bottom:20px;">
+                        <vlayout>
+                            <button id="add" label="Guardar" onClick="@command('update', cmp=winproductomodificar)"  class="btn btn-primary" width="100px" height="30px" image="images/guardar.png" />
+                       
+                    
+                        </vlayout>
+                    </cell>
+                </row>
+                
+            </rows>
+        </grid>
+        
+    </window>
+</zk>

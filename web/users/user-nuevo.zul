@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winusernuevo"
+             title="Nuevo Usuario" 
+             border="normal"
+             width="500px" 
+             height="auto" 
+             minimizable="false" 
+             maximizable="false"
+             mode="modal"  
+             closable="true" 
+             action="hide: slideUp"
+             apply="org.zkoss.bind.BindComposer"
+             viewModel="@id('vm') @init('com.clinica.veterinaria.user.UserEmergenteVM')"
+             validationMessages="@id('vmsgs')" 
+             visible="false">
+         <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String menu = "menu.zul";
+
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else{
+                    if(UserCredentialManager.getIntance(session).getRol() == 1)
+                        menu = "menu-admin.zul";
+
+                    winusernuevo.setVisible(true);
+                }
+
+        </zscript>
+        
+        
+  
+        <grid id="mygrp"
+              form="@id('zk_user')
+                    @load(winusernuevo.detach(), after='sendNew')
+                    @save(vm.newEvent, before='sendNew')  ">
+            <columns>
+                <column label="Datos Usuario" width="150px" />
+                <column label="" width="325px"/>
+            </columns>
+            <rows>
+                <row>
+                    <label value="Alias *" width="150px" />
+                    <textbox id="txtNick"
+                             cols="25"
+                             value="@bind(zk_user.user)"
+                             width="195px"
+                             constraint="no empty"/>
+                </row>
+                <row>
+                    <label value="Contraseña *" width="150px" />
+                    <textbox id="txtPassword" 
+                             cols="25" 
+                             value="@bind(zk_user.password)"
+                             width="195px"
+                             constraint="no empty"
+                             type="password"/>
+                </row>
+                <row>
+                    <label value="CUIT *" width="150px" />
+                    <intbox id="txtNIF"
+                             cols="25"
+                             value="@bind(zk_user.nif)"
+                             width="195px"
+                             constraint="/^([X|x](-|\.)?0?\d{7}(-|\.)?[A-Za-z]|[A-Za-z](-|\.)?\d{7}(-|\.)?[0-9A-Za-z]|\d{9}(-|\.)?)$/: CUIT incorrecto" 
+                             maxlength="9"/>
+                </row>
+                <row>
+                    <label value="Nombre *" width="150px" />
+                    <textbox id="txtNombre"
+                             cols="25"
+                             value="@bind(zk_user.nombre)"
+                             width="195px"
+                             constraint="no empty" />
+                </row>
+                <row>
+                    <label value="Apellidos *" width="150px" />
+                    <textbox id="txtApellidos"
+                             cols="25"
+                             value="@bind(zk_user.apellidos)"
+                             width="195px"
+                             constraint="no empty" />
+                </row>
+                <row>
+                    <label value="Rol *" width="150px" />
+                    <listbox id="lstbTipo" rows="1" mold="select" selectedItem="@save(zk_user.tipo)" height="25px" width="200px">
+                        <listitem label="Administrador" value="1" />
+                        <listitem label="Veterinario"   value="2" />
+                        <listitem label="Empleado"      value="3" />
+                    </listbox>
+                </row>
+                <row>
+                    <label value="Dirección *" width="150px" />
+                    <textbox id="txtDireccion"
+                             cols="25"
+                             width="195px"
+                             value="@bind(zk_user.direccion)"
+                             constraint="no empty"/>
+                </row>
+                <row>
+                    <label value="Provincia *" width="150px" />
+                    <selectbox id="provincias"
+                              model="@load(vm.provincias)"
+                              selectedItem="@bind(vm.selectedProvincia)
+                                            @bind(zk_user.provincia)"
+                              onSelect="@command('onSelectProvincia')"
+                              width="200px"
+                    height="25px">
+                        <template name="model">
+                            <label value="@bind(each.provincia)" />
+                        </template>
+                    </selectbox>
+                </row>
+                <row>
+                    <label value="Localidad *" width="150px" />
+                    <selectbox id="poblaciones"
+                              model="@load(vm.allPoblaciones)"
+                              selectedItem="@bind(zk_user.poblacion)"
+                              width="200px"
+                    height="25px">
+                        <template name="model">
+                            <label value="@bind(each.poblacion)" />
+                        </template>
+                    </selectbox>
+                </row>
+                <row>
+                    <label value="Teléfono *" width="150px" />
+                    <intbox id="intTelefono"
+                            cols="25"
+                            width="195px"
+                            value="@bind(zk_user.telefono)"
+                            
+                            maxlength="9" />
+                </row>
+                <row>
+                    <label value="Celular" width="150px" />
+                    <intbox id="intTelefono2"
+                            cols="25"
+                            width="195px"
+                            value="@bind(zk_user.movil)"
+                            style="margin-right:15px;"
+                    />
+                </row>
+                <row>
+                    <label value="Email *" />
+                    <textbox id="txtEmail"
+                             cols="25"
+                             width="195px"
+                             value="@bind(zk_user.email)"
+                             constraint="/.+@.+\.[a-z]+/: Por favor, introduce una dirección de e-mail"
+                    />
+                </row>
+                <row>
+                    <label value="DNI" />
+                    <textbox id="txtNss"
+                             cols="25"
+                             width="195px"
+                             value="@bind(zk_user.nss)"
+                    />
+                </row>
+                <row>
+                    <cell height="50px" colspan="3" style="text-align:center">
+                        <vlayout>
+                    <button id="add" label="Guardar" onClick="@command('sendNew')"  class="btn btn-primary" width="100px" height="30px" image="images/guardar.png" >
+                       
+                    </button>
+                        </vlayout>
+                    </cell>
+                </row>
+            </rows>
+        </grid>
+    </window>
+</zk>

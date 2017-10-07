@@ -1,0 +1,60 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window title="Consulta de Clientes" 
+            border="normal"
+            minimizable="false" 
+            maximizable="false"
+            mode="modal"
+            width="800px"
+            height="400px"
+            closable="true" 
+            action="hide: slideUp"
+            position="center,center"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('app.consulta.ConsultaViewModel')"
+            form="@id('zk_consulta') @load(vm.selectedEvent)">
+       
+        <listbox
+            mold="paging"
+            pageSize="10"
+            rows="10"
+            style="overflow:auto;"
+            model="@bind(vm.consultas)"
+            selectedItem="@bind(vm.selectedEvent)"  
+        >
+            <auxhead>
+                <auxheader><textbox value="@bind(vm.filterFecha)" instant="true" onChange="@command('doSearch')"  width="95%" /></auxheader>
+                <auxheader><textbox value="@bind(vm.filterCliente)" instant="true" onChange="@command('doSearch')"  width="95%" /></auxheader>
+                <auxheader><textbox value="@bind(vm.filterMascota)" instant="true" onChange="@command('doSearch')"  width="95%" /></auxheader>
+                <auxheader/>
+                <auxheader/>
+                <auxheader><checkbox checked="@bind(vm.filterVisto)" onCheck="@command('doSearch')"  width="95%" /></auxheader>
+            
+            </auxhead>
+            <listhead >
+                <listheader label="Fecha" sort="auto(fecha)" width="90px"/>
+                <listheader label="Cliente" sort="auto(clienteNombre)" width="120px"/>
+                <listheader label="Mascota" sort="auto(mascota.nombre)" width="120px"/>
+                <listheader label="Descripción" />
+                <listheader label="Imagen" width="60px"/>
+                <listheader label="Visto" width="40px"/>
+            </listhead>
+            <template name="model" var="zk_consulta" >
+                <listitem value="@load(zk_consulta)" >
+                    
+                    <listcell label="@load(zk_consulta.fecha)"  />
+                    <listcell label="@load(zk_consulta.clienteNombre) "  />
+                    <listcell label="@load(zk_consulta.mascota.nombre) "  />
+                    <listcell label="@load(zk_consulta.descripcion) "  />
+                    <listcell >
+                        <button label="Ver" onClick="@command('visto', item= zk_consulta)"/>
+                    </listcell>
+                    <listcell>
+                        <checkbox disabled="true" checked="@load(zk_consulta.visto)" />
+                    </listcell>
+                </listitem>
+            </template>
+        </listbox>
+    </window>
+
+
+</zk>

@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul">
+     <window id="ventanaPago" 
+               
+            position="center,center"
+            mode="modal"
+            title="Pago"
+            border="normal"  
+            closable="true"
+            width="330px"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('app.pagos.PagoViewModel')"   >
+         
+        <grid
+            form="@id('zk_pago') 
+                  @load(vm.newPago)
+                  @save(vm.newPago, before='add')" 
+        >
+            <columns>
+                <column label="" width="75px"/>
+                <column label="" width="230px"/>
+            </columns>
+            <rows>
+                <row>
+                    Fecha:
+                    <datebox value="@bind(zk_pago.fecha)"   format="dd/MM/yyyy"  width="175px"  constraint="no past, no empty"  readonly="true" />
+                </row>
+                <row>
+                    Monto:
+                    <doublebox  value="@bind(zk_pago.monto)"  format="#,##0.##" locale="en" width="175px"  />
+                </row>
+                <row>
+                <cell colspan="3" style="text-align:center">
+                    <hlayout>
+                        <button class="btn btn-primary" label="Pagar"    onClick="@command('add', cmp=ventanaPago)"       width="100px" height="30px" image="/images/guardar.png" />
+                        <button class="btn btn-primary" label="Cancelar" onClick="ventanaPago.detach()"  width="100px" height="30px" image="/images/Erase.png" />
+                    </hlayout>
+                </cell>
+                </row>
+            </rows>
+	</grid>
+    </window>
+</zk>

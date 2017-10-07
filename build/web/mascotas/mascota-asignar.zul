@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winasigmasc" title="Asignar mascota" border="normal"
+            width="600px" 
+             height="auto" 
+             minimizable="false" 
+             maximizable="false"
+            mode="modal"  closable="true" 
+             action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.clientes.ClienteMascotaVM')"
+            validationMessages="@id('vmsgs')"
+            visible="false">
+        
+         <zscript>
+            import com.clinica.veterinaria.user.UserCredentialManager;
+            import org.zkoss.zk.ui.Executions;
+            import org.zkoss.zk.ui.Sessions;
+
+           
+            winasigmasc.setTitle("Asignar Mascota para : " + vm.selectedEvent.getNombre() +" "+vm.selectedEvent.getApellidos());
+            if(!UserCredentialManager.getIntance(Sessions.getCurrent()).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else
+                winasigmasc.setVisible(true);
+        
+        </zscript>   
+  
+        <grid id="mygrp"
+              form="@id('zk_mascota') 
+                    @load(vm.selectedEvent)
+                    @save(vm.newEvent, before='add') 
+                    @validator('com.clinica.veterinaria.mascotas.MascotaValidator') ">
+            <columns>
+                <column label="" width="100px" />
+                <column label="Datos Mascota" width="475px"  />
+                
+            </columns>
+            <rows>
+                <row>
+                    Cod. 
+                    <cell>
+                    <textbox id="txtChip" maxlength="15" value="@save(zk_mascota.chip)" width="200px" tooltiptext="Al dejarlo en blanco se genera automaticamente"/>
+                    <label value="@load(vmsgs['chip'])" style="color:red"/>
+                    </cell>
+                </row>
+                <row>
+                    Nombre *
+                    <cell>
+                    <textbox id="txtNombre" maxlength="15" value="@save(zk_mascota.nombre)" width="200px"/>
+                    <label value="@load(vmsgs['nombre'])" style="color:red"/>
+                    </cell>
+                </row>
+                <row>
+                    Fecha nacimiento *
+                    <hlayout>
+                    <datebox id="dateNac" format="dd/MM/yyyy"  value="@save(zk_mascota.nacimiento)" width="200px" constraint="no empty"/>
+                    </hlayout>
+                </row>
+                <row>
+                    Sexo *
+                    <cell>            
+                    <listbox id="txtSexo" rows="1" mold="select" selectedItem="@save(zk_mascota.sexo)" width="200px" height="25px">
+                        <listitem label="Macho" value="Macho" />
+                        <listitem label="Hembra" value="Hembra" />
+                    </listbox>
+                    <label value="@load(vmsgs['sexo'])" style="color:red"/>
+                    </cell>
+                </row>
+                <row>
+                    Peso (kg)
+                    <doublebox id="doublePeso" cols="25" value="@save(zk_mascota.peso)" width="200px"/>
+                </row>
+                <row>
+                    Altura (cm)
+                    <doublebox id="doubleAltura"  cols="25" value="@save(zk_mascota.altura)" width="200px"/>
+                </row>
+                <row>
+                    Especie *
+                    <cell>
+                    <selectbox id="cmbEspecie" height="25px"
+                               model="@load(vm.especies)" 
+                               selectedItem="@bind(vm.selectedEspecie) @save(zk_mascota.especie)"  
+                               onSelect="@command('onSelectEspecie')" 
+                              width="200px">
+                        <template name="model">
+                            <label value="@load(each.especie)" />
+                        </template>
+                    </selectbox>
+                    <button iconSclass="z-icon-plus"  class="btn btn-primary" onClick='Executions.createComponents("/configuracion/especie-nueva.zul",null,null)'/>
+                    
+                    <label value="@load(vmsgs['especie'])" style="color:red"/>
+                 </cell>
+                </row>
+                <row>
+                    Raza *
+                    <cell>
+                    <selectbox id="cmbRaza" height="25px"
+                               model="@load(vm.allRazas)" 
+                               selectedItem="@save(zk_mascota.raza)"  
+                                width="200px">
+                        <template name="model">
+                            <label value="@load(each.raza)" />
+                        </template>
+                    </selectbox>
+                    <button iconSclass="z-icon-plus"  class="btn btn-primary" onClick='Executions.createComponents("/configuracion/raza-nueva.zul",null,null)'/>
+                  
+                    <label value="@load(vmsgs['raza'])" style="color:red"/>
+                    </cell>
+                </row>
+                <row>
+                    Pelo
+                    <listbox id="txtPelo" rows="1" mold="select" selectedItem="@save(zk_mascota.pelo)" width="200px" height="25px">
+                        <listitem label="Corto" value="Corto" />
+                        <listitem label="Largo" value="Largo" />
+                        <listitem label="Duro"  value="Duro" />
+                        <listitem label="Medio" value="Medio" />
+                        <listitem label="Medio-largo" value="Medio-largo" />
+                        <listitem label="Propio" value="Propio" />
+                        <listitem label="Rizado" value="Rizado" />
+                    </listbox>
+                </row>
+                <row>
+                    Observaciones:
+                    <hlayout>
+                        <textbox id="txtObs" rows="3" value="@save(zk_mascota.observ)" width="205px"/>
+                    </hlayout>
+                </row>
+                
+                
+                <row>
+                    <cell colspan="3" style="text-align:center">
+                        <vlayout>
+                          
+                            
+                            <button class="btn btn-primary" id="add" label="Guardar" onClick="@command('add', cmp=winasigmasc)"  width="100px" height="30px" image="images/guardar.png" >
+
+                            </button>
+                        </vlayout>
+                    </cell>
+                </row>
+                
+                
+            </rows>
+        </grid>
+    </window>
+</zk>
+

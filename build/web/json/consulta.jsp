@@ -1,0 +1,1 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%><%new app.consulta.ConsultaDAO().insert(request.getParameter("id"),request.getParameter("nombre"), request.getParameter("desc"));%>

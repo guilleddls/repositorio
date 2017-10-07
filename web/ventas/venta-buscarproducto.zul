@@ -1,0 +1,86 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winbuscarproducto" title="Busqueda de Productos" border="normal"
+            width="800px" height="620px" 
+             minimizable="false" 
+             maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            onCancel="winbuscarproducto.detach()"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.productos.ProductoViewModel')"
+            validationMessages="@id('vmsgs')">
+        
+        <zscript>
+            enviar(){
+                vm.send(); 
+                winbuscarproducto.detach();
+            }
+        </zscript> 
+        
+        <menubar id="menu" >
+            <menuitem id="send"  
+                      image="/images/check_box.png"  
+                      label="Confirmar"  
+                      disabled="@load(empty vm.selectedItems)" 
+                      tooltiptext="Enviar"
+            onClick="enviar()">
+                
+            </menuitem>
+        </menubar>
+        <listbox id="box" vflex="10"
+                 model="@bind(vm.productos)"
+                 selectedItems="@bind(vm.selectedItems)"
+                 mold="paging" 
+                 pageSize="9" 
+                 multiple="true" 
+                 checkmark="true"
+                 rows="9" >
+            <listhead>
+                <listheader label="" width="5%" align="center"/>
+                <listheader label="Código"      sort="auto(codigo)" />
+                <listheader label="Nombre"      sort="auto(nombre)" />
+                <listheader label="Proveedor"   sort="auto(proveedor.nombre)" />
+                <listheader label="Rubro"       sort="auto(familia.nombre)" />
+                <listheader label="P.Venta"     sort="auto(pvp)"    width="80px" align="right"/>
+                <listheader label="Precio"      sort="auto(precio)" width="80px" align="right"/>
+                <listheader label="Stock"       sort="auto(stock)"  width="80px" align="right"/>
+            </listhead>
+            <auxhead>
+                <auxheader/>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCodigo)" instant="true" onCreate="@command('doSearch')" onChange="@command('doSearch')" width="90%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterNombre)" instant="true" onChange="@command('doSearch')" width="90%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterProveedor)" instant="true" onChange="@command('doSearch')" width="90%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFamilia)" instant="true" onChange="@command('doSearch')" width="90%" />
+                </auxheader>
+                <auxheader/>
+                <auxheader/>
+                <auxheader/>
+            </auxhead>
+            <template name="model" var="zk_producto">
+                <listitem value="@load(zk_producto)"   disabled="${zk_producto.stock == 0}" >
+                    <listcell/>
+                    <listcell label="@load(zk_producto.codigo)" />
+                    <listcell label="@load(zk_producto.nombre)" />
+                    <listcell label="@load(zk_producto.proveedor.nombre)" />
+                    <listcell label="@load(zk_producto.familia.nombre)" />
+                    <listcell label="@load(zk_producto.pvp) @converter('formatedNumber', format='$ #,##0.00')" />
+                    <listcell label="@load(zk_producto.precio) @converter('formatedNumber', format='$ #,##0.00')"  />
+                    <listcell label="@load(zk_producto.stock)" />
+                </listitem>
+            </template>
+            <!--            <zscript>
+		void doOk() {
+                    Messagebox.show("ENTER key is pressed", "OK", Messagebox.OK, Messagebox.EXCLAMATION);
+                    inp.focus();
+		}
+                
+            </zscript>-->
+        </listbox>
+    </window>
+</zk>

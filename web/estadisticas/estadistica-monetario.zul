@@ -1,0 +1,152 @@
+ 
+   
+<div  apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.estadisticas.EstadisticosMascVM')">
+
+    <vlayout spacing="0" hflex="1">  
+    <!-- INDICE DE ARRIBA -->            
+        <div sclass="breadcrumbs">
+            <div sclass="breadcrumb">
+                <span sclass="home-bar-chart-o z-icon-bar-chart-o"/>
+                <a label="Estadisticas" href="#"/>
+                <label value="Movimientos"/>
+            </div>
+            <!-- Search input-->
+            <include src="/content/search.zul"/>
+        </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <!--div sclass="page-header">
+                <label value="Estadisticas"/>
+                <a label="Gráficas Ingresos/Gastos" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div-->
+            
+            
+            
+            <hlayout spacing="24px">
+
+
+            <div style="margin-bottom:10px; margin-top: 10px">
+                <label value="Año: " /> 
+                <intbox 
+                        id="bnxYear"
+                        onOK="@command('year')"
+                        value="@bind(vm.selectedYear)"
+                        cols="25"
+                        constraint="/^19[0-9]{2}|2[0-9]{3}$/: Debe introducir un año desde 1900 a 2999"
+                        focus="true"
+                />
+                <button label="Buscar" onClick="@command('year')" class="btn btn-primary" iconSclass="z-icon-search"/>
+            </div>
+            </hlayout>
+       
+       
+       <hlayout>
+        <grid model="@load(vm.ingresos)">
+            <auxhead>
+                <auxheader label="" />
+                <auxheader label="1º Trimestre" colspan="3" />
+                <auxheader label="2º Trimestre" colspan="3" />
+                <auxheader label="3º Trimestre" colspan="3" />
+                <auxheader label="4º Trimestre" colspan="3" />
+            </auxhead>
+            <columns>
+                <column label="Tipo" />
+                <column label="Enero" align="right"/>
+                <column label="Febrero" align="right"/>
+                <column label="Marzo" align="right"/>
+                <column label="Abril" align="right"/>
+                <column label="Mayo" align="right"/>
+                <column label="Junio" align="right"/>
+                <column label="Julio" align="right"/>
+                <column label="Agosto" align="right"/>
+                <column label="Septiembre" align="right"/>
+                <column label="Octubre" align="right"/>
+                <column label="Noviembre" align="right"/>
+                <column label="Diciembre" align="right"/>
+            </columns>
+            <template name="model" var="item" >
+                <row>
+                    <label value="@load(item.tipo)"/>
+                    <label value="@load(item.enero) @converter('formatedNumber', format='$ #,##0.00')"/>
+                    <label value="@load(item.febrero) @converter('formatedNumber', format='$ #,##0.00')"/>
+                    <label value="@load(item.marzo) @converter('formatedNumber', format='$ #,##0.00')"/>
+                    <label value="@load(item.abril) @converter('formatedNumber', format='$ #,##0.00')"/>
+                    <label value="@load(item.mayo) @converter('formatedNumber', format='$ #,##0.00')"/>
+                    <label value="@load(item.junio) @converter('formatedNumber', format='$ #,##0.00')"/>
+                    <label value="@load(item.julio) @converter('formatedNumber', format='$ #,##0.00')"/>
+                    <label value="@load(item.agosto) @converter('formatedNumber', format='$ #,##0.00')"/>
+                    <label value="@load(item.septiembre) @converter('formatedNumber', format='$ #,##0.00')"/>
+                    <label value="@load(item.octubre) @converter('formatedNumber', format='$ #,##0.00')"/>
+                    <label value="@load(item.noviembre) @converter('formatedNumber', format='$ #,##0.00')"/>
+                    <label value="@load(item.diciembre) @converter('formatedNumber', format='$ #,##0.00')"/>
+                </row>
+            </template>
+        </grid>
+       </hlayout>
+       
+        <hlayout spacing="24px">
+            <zhighcharts id="chart"
+                        model="@load(vm.grafica2)"
+                        type="column"
+                        width="900px"
+                        height="320px"
+                        style="margin-top:10px; font-weight:bold; float: left" 
+            />
+            <zscript>
+                <![CDATA[
+                    import java.text.DecimalFormat;
+                    DecimalFormat df = new DecimalFormat("0.00");
+                    chart.setTitle("Gráfica Ingresos/Gastos");
+                    chart.setType("column");
+                    chart.setLegend("{" +
+                                        "layout: 'vertical'," +
+                                        "backgroundColor: '#FFFFFF'," +
+                                        "align: 'right'," +
+                                        "verticalAlign: 'top'," +
+                                        "x: 0," +
+                                        "y: 20," +
+                                        "floating: true," +
+                                        "borderWidth: 0" +
+                                    "}");
+                    chart.setxAxisOptions("{" +
+                                                "categories: [" +
+                                                        "'Ene', " +
+                                                        "'Feb', " +
+                                                        "'Mar', " +
+                                                        "'Abr', " +
+                                                        "'May', " +
+                                                        "'Jun', " +
+                                                        "'Jul', " +
+                                                        "'Ago', " +
+                                                        "'Sep', " +
+                                                        "'Oct', " +
+                                                        "'Nov', " +
+                                                        "'Dic'" +
+                                                "]" +
+                                        "}");
+                    chart.setPlotOptions("{" +
+                                        "series:{" +
+                                                "dataLabels:{" +
+                                                        "formatter: function (){ return this.y + ' $';}," + 
+                                                        "enabled: false" +
+                                                "}" +
+                                        "}" +
+                                "}");
+                    chart.setTooltipFormatter("function formatTooltip(obj){ " +
+                        "return '<b>'+ obj.series.name +'</b>" +
+                        "<br/>'+ obj.x +': $ '+ Highcharts.numberFormat(obj.y, 2, ',') ;" +
+                    "}");
+                ]]>
+            </zscript>
+        </hlayout>
+        
+        
+        </vlayout>
+    </vlayout>
+</div>
+   
+     
+     
+

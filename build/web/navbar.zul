@@ -1,0 +1,166 @@
+<div sclass="navbar" apply="com.clinica.veterinaria.util.NavbarComposer">
+    <zscript>
+        <![CDATA[
+            import org.zkoss.zk.ui.Executions;
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            String snombre, srol;
+            int rol;
+            
+                        
+            public void Nuevo(String ruta) {
+                Executions.createComponents(ruta, null, null);
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else{
+                    rol = UserCredentialManager.getIntance(Sessions.getCurrent()).getRol();
+                    snombre = UserCredentialManager.getIntance(Sessions.getCurrent()).getUser().getNombre();
+                    if(rol == 1){
+                        srol = "Admin";
+                    }
+                    else if(rol == 2){
+                        srol = "Veterinario";
+                    }
+                    else if(rol == 3){
+                        srol = "Gestor";
+                    }
+                    else{
+                        srol="Empleado";
+                    }
+                }
+        ]]>
+    </zscript>
+    <!-- Brand Logo -->	
+    <a label=" Veterinaria San Carlos" sclass="pull-left navbar-brand" image="/images/vete.png"/>
+    <!-- Navbar -->
+    <hlayout sclass="nav-user pull-right" spacing="0">
+        <a	id="atask" iconSclass="z-icon-tasks" popup="taskpp, position=after_end, type=toggle" sclass="grey">
+            <label value="4" sclass="badge badge-grey"/>
+        </a>
+        <a	apply="org.zkoss.bind.BindComposer"	viewModel="@id('vm') @init('app.consulta.ConsultaViewModel')"
+			id="anoti" iconSclass="z-icon-bell" popup="notipp, position=after_end, type=toggle" sclass="purple">
+            <label value="@load(vm.countConsulta)" sclass="badge badge-important"/>
+        </a>
+        <!--a id="amsg" iconSclass="z-icon-envelope" popup="msgpp, position=after_end, type=toggle" sclass="green">
+            <label value="5" sclass="badge badge-success"/>
+        </a-->
+        
+        <!-- User menu -->
+        <menubar sclass="user-menu light-blue">
+            <menu tooltiptext="Perfil de Usuario" label="${snombre} (${srol})" iconSclass="z-icon-user">
+                <menupopup>
+                    <menuitem label="Configuración" image="/images/unlock.png" onClick='Nuevo("/users/user-password.zul")'/>
+                    
+                    <menuseparator/>
+                    <menuitem label="Salir" image="/images/exit.png" onClick="logout()"/>
+                </menupopup>
+            </menu>
+        </menubar>
+    </hlayout>
+    <!-- Popups of navbar -->
+    <popup id="taskpp" sclass="menu" width="240px">
+        <a label="Ayuda online" sclass="header" iconSclass="z-icon-info"/>
+        <vlayout spacing="0">
+            <a href="http://json-veterinaria.16mb.com/" target="_blank"> 
+                <div>
+                    <label class="pull-left" value="Manual de Usuario"/>
+                    <label class="pull-right" value="100"/>
+                </div>
+                <progressmeter value="100" width="100%"/>
+            </a>
+        
+            <!--a href="#">
+                <div>
+                    <label class="pull-left" value="Hardware Upgrade"/>
+                    <label class="pull-right" value="35%"/>
+                </div>
+                <progressmeter value="35" width="100%" sclass="progressmeter-danger"/>
+            </a>
+            <a href="#">
+                <div>
+                    <label class="pull-left" value="Unit Testing"/>
+                    <label class="pull-right" value="15%"/>
+                </div>
+                <progressmeter value="15" width="100%" sclass="progressmeter-warning"/>
+            </a>
+            <a href="#">
+                <div>
+                    <label class="pull-left" value="Bug Fixes"/>
+                    <label class="pull-right" value="90%"/>
+                </div>
+                <progressmeter value="90" width="100%" sclass="progressmeter-success striped active"/>
+            </a>
+            <a label="See tasks with details" href="#">
+                <span class="z-icon-arrow-right"/>
+            </a-->
+        </vlayout>
+    </popup>
+    
+    <popup id="notipp" sclass="menu menu-pink" width="240px">
+        <a label="Consultas" sclass="header" iconSclass="z-icon-exclamation-triangle"/>
+        <vlayout spacing="0">
+            <!--a iconSclass="btn btn-xs no-hover btn-pink z-icon-comment" href="#">
+                <label>New Comments</label>
+                <label value="+12" class="badge badge-info pull-right"/>
+            </a>
+            <a iconSclass="btn btn-xs no-hover btn-primary z-icon-user" href="#">
+                <label>Bob just signed up as an editor ...</label>
+            </a>
+            <a iconSclass="btn btn-xs no-hover btn-success z-icon-shopping-cart" href="#">
+                <label>New Orders</label>
+                <label value="+8" class="badge badge-info pull-right"/>
+            </a>
+            <a iconSclass="btn btn-xs no-hover btn-info z-icon-twitter" href="#">
+                <label>Followers</label>
+                <label value="+11" class="badge badge-info pull-right"/>
+            </a-->
+            <a id="aconsulta" label="Ver todas las consultas" href="#" >
+                <span class="z-icon-arrow-right"/>
+            </a>
+        </vlayout>
+    </popup>
+    
+    <popup id="msgpp" sclass="menu" width="240px">
+        <a label="5 Messages" sclass="header" iconSclass="z-icon-envelope-o"/>
+        <vlayout spacing="0">
+            <!--a href="#">
+                <image tooltiptext="Alex's Avatar" src="assets/avatars/avatar.png" sclass="msg-photo"/>
+                <span sclass="msg-body">
+                    <span sclass="msg-title">
+                        <label value="Alex:" sclass="blue"/>
+                        Ciao sociis natoque penatibus et auctor ...
+                    </span>
+                    <span sclass="msg-time">
+                        <span class="z-icon-clock-o"/>a moment ago</span>
+                </span>
+            </a>
+            <a href="#">
+                <image tooltiptext="Susan's Avatar" src="assets/avatars/avatar3.png" sclass="msg-photo"/>
+                <span class="msg-body">
+                    <span class="msg-title">  
+                        <label value="Susan:" sclass="blue"/>  Vestibulum id ligula porta felis euismod ... </span>
+                        <span sclass="msg-time">
+                            <span class="z-icon-clock-o"/>20 minutes ago</span>
+                </span>
+            </a>
+            <a href="#">
+                <image tooltiptext="Bob's Avatar" src="assets/avatars/avatar4.png" sclass="msg-photo"/>
+                <span class="msg-body">
+                    <span class="msg-title">
+                        <label value="Bob:" sclass="blue"/>
+                        Nullam quis risus eget urna mollis ornare ...
+                    </span>
+                    <span sclass="msg-time">
+                        <span class="z-icon-clock-o"/>3:15 pm</span>
+                </span>
+            </a-->
+            <a label="See all messages" href="#">
+                <span class="z-icon-arrow-right"/>
+            </a>
+        </vlayout>
+    </popup>
+</div>

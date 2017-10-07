@@ -1,0 +1,61 @@
+<div>
+<style src="/calendario/css/style.css" /> 
+        <vlayout spacing="0" hflex="1">  
+                 <!-- INDICE DE ARRIBA -->  
+                             
+            <div sclass="breadcrumbs">
+                <div sclass="breadcrumb">
+                    <span sclass="home-calendar z-icon-calendar"/>
+                    <a label="Calendario" href="#"/>
+                    <label value="Eventos de Turnos"/>
+                </div>
+                <!-- Search input-->
+                <include src="/content/search.zul"/>
+            </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+           
+        
+        <hlayout>
+    
+    <window hflex="10" border="normal" vflex="10" >
+        <!-- Calendars Body -->
+        <div apply="app.calendario.CalendarController">
+            <!-- Control Menu -->
+            <hlayout sclass="z-valign-middle">
+                <button id="today" label="Hoy"  class="btn btn-primary"/>
+                <button id="prev" image="/calendario/img/arrow-180.png"  class="btn btn-light"/>
+                <button id="next" image="/calendario/img/arrow.png" class="btn btn-light"/>
+                <separator width="50px" />
+                <button id="pageDay" label="Dia" width="55px"  class="btn btn-primary" />
+                <button id="pageWeek" label="Semana" width="75px"  class="btn btn-primary"/>
+                <button id="pageMonth" label="Mes" width="55px"  class="btn btn-primary"/>
+                <separator width="50px" />
+                Buscar :
+                <textbox id="filter"/>
+                <button id="applyFilter" label="Aplicar"  class="btn btn-primary"/>
+                <button id="resetFilter" label="Resetear"  class="btn btn-primary"/>
+                <label id="fecha" value="" style="font-size: 20px; float: right; text-align: right;"/>
+            </hlayout>
+            <separator bar="true" height="20px"/>
+         
+            
+            <!-- CALENDARIO!!-->
+            <calendars id="calendars" 
+                       firstDayOfWeek="Sunday" 
+                       height="600px"
+                       timeZone="Main=GMT+0" mold="month"/>
+        </div>
+ 
+        <!-- Create/Update Event Popup -->
+        <include src="/calendario/calendario_editor.zul" />
+ 
+        <!-- Server+Client Fusion - Mouse Scroll Handling -->
+        <script type="text/javascript"  src="/calendario/js/jquery.mousewheel.min.js" />
+        <script type="text/javascript"  src="/calendario/js/scroll.js" />
+    </window>
+        </hlayout>
+        </vlayout>
+        </vlayout>
+</div>

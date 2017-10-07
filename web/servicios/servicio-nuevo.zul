@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns:n="native" >
+    <window id="winservicionuevo" 
+            title="Servicio Nuevo" 
+            border="normal"
+            width="400px" 
+            height="auto" 
+            minimizable="false" maximizable="false"
+            mode="modal"  
+            closable="true" 
+            action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.servicios.ServicioViewModel')"
+            validationMessages="@id('vmsgs')" 
+            visible="true">
+        
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            
+
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            
+
+        </zscript>
+
+        
+        <grid id="mygrp"
+              form="@id('zk_servicio') 
+                    @load(vm.selectedEvent) 
+                    @save(vm.selectedEvent, before='update')
+                    @save(vm.newEvent, before='add')
+                    @validator('com.clinica.veterinaria.servicios.ServicioValidator')">
+            <columns>
+                <column label="" width="100px" align="right"/>
+                <column label="Datos del Servicio" width="277px"/>
+            </columns>
+            <rows>
+                <row>
+                    Nombre
+                    <cell>
+                    <textbox id="txtNombre" cols="25" value="@bind(zk_servicio.nombre)" width="200px" maxlength="20" />
+                    <label style="color:red" value="@load(vmsgs['nombre'])" />
+                    </cell>
+                </row>
+                <row>
+                    Familia
+                    <cell>
+                    <selectbox id="cmbFamilia" 
+                              model="@load(vm.familias)" 
+                              selectedItem="@bind(zk_servicio.familia)"  
+                              width="200px"
+                              height="25px" >
+                        <template name="model">
+                            <label value="@bind(each.nombre)" />
+                        </template>
+                    </selectbox>
+                    <label style="color:red" value="@load(vmsgs['familia'])" />
+                    </cell>
+                </row>
+                <row>
+                    IVA
+                    <cell>
+                    <selectbox id="cmbIva"
+                              model="@load(vm.ivas)" 
+                              selectedItem="@save(zk_servicio.iva)"  
+                              width="200px"
+                              height="25px">
+                        <template name="model">
+                            <label value="@bind(each.valor)" />
+                        </template>
+                    </selectbox>
+                    <label style="color:red" value="@load(vmsgs['iva'])" />
+                    </cell>
+                </row>
+                <row>
+                    Precio
+                    <cell>
+                    <doublebox id="dbxPrecio" 
+                               cols="25" 
+                               value="@bind(zk_servicio.precio)" 
+                               width="200px" format="#,##0.##" 
+                               maxlength="8"/>
+                    <label style="color:red" value="@load(vmsgs['precio'])" />
+                    </cell>
+                </row>
+                <row>
+                    Descripción
+                    <textbox id="txtObserv"
+                             cols="25"
+                             rows="10"
+                             value="@bind(zk_servicio.descripcion)" 
+                             width="200px" 
+                             height="70px"/>
+                </row>
+                
+                <row>
+                    <cell height="50px" colspan="3" style="text-align:center; padding-top:10px; padding-bottom:20px;">
+                        <vlayout>
+                            <button id="add" label="Guardar" onClick="@command('add', cmp=winservicionuevo)"  class="btn btn-primary" width="100px" height="30px" image="images/guardar.png" />
+                       
+                    
+                        </vlayout>
+                    </cell>
+                </row>
+                
+            </rows>
+        </grid>
+    </window>
+</zk>

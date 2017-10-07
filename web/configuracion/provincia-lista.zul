@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="winprovincianueva" 
+            title="Provincia" 
+            border="normal"
+            width="320px" 
+            height="570px" 
+            minimizable="false" 
+            maximizable="false"
+            mode="modal"  
+            closable="true"
+            action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.provincias.ProvinciaViewModel')"
+            validationMessages="@id('vmsgs')" 
+            
+     >
+            
+             <menubar id="menu" >
+                <menuitem id="add"    image="/images/nuevo.png"   label="Nuevo" onClick="@command('add')" tooltiptext="Nuevo"/>
+                <menuitem id="update" image="/images/guardar.png" label="Modificar" onClick="@command('update')" disabled="@load(empty vm.selectedEvent)" tooltiptext="Modificar" />
+            </menubar>
+
+
+
+            <groupbox id="mygrp"
+                form="@id('zk_provincia') 
+                      @load(vm.selectedEvent) 
+                      @save(vm.selectedEvent, before='update') 
+                      @save(vm.newEvent, before='add') 
+                      @validator('com.clinica.veterinaria.provincias.ProvinciaValidator')">
+                
+                <caption label="Provincia Agregar/Modificar" />
+
+                <div style="margin-bottom:10px">
+                    Provincia: 
+                    <textbox id="txtProvincia" 
+                             cols="25" 
+                             value="@bind(zk_provincia.provincia)" 
+                             style="margin-left:33px; margin-right: 15px"
+                             constraint="no empty"/>
+                </div>
+
+                <hlayout>
+                    <label style="color:red" value="@load(vmsgs['provincia'])" />
+                </hlayout>
+            </groupbox>
+        
+
+        <listbox id="box" 
+                 multiple="true" 
+                 rows="10" 
+                 model="@bind(vm.events)" 
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 width="300px" height="400"  style="overflow:auto;">
+
+            <listhead>
+                <listheader label="Número"      sort="auto(id)"/>
+                <listheader label="Provincia"   sort="auto(Provincia)"/>
+            </listhead>
+
+            <template name="model" var="zk_provincia">
+                <listitem value="@load(zk_provincia)">
+                    <listcell label="@load(zk_provincia.id)" />
+                    <listcell label="@load(zk_provincia.provincia)" />
+                </listitem>
+            </template>
+
+        </listbox>
+       
+        
+    </window>
+</zk>

@@ -1,0 +1,59 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win-iva-nuevo" title="IVA Nuevo" border="normal"
+            width="470px" height="500px" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.iva.IvaViewModel')"
+            validationMessages="@id('vmsgs')">
+        
+        <menubar id="menu" >
+            <menuitem id="add"    image="/images/nuevo.png"   label="Nuevo"     onClick="@command('add')" tooltiptext="Nuevo"/>
+            <menuitem id="update" image="/images/guardar.png" label="Modificar" onClick="@command('update')" disabled="@load(empty vm.selectedEvent)" tooltiptext="Modificar" />
+        </menubar>
+        
+        <groupbox id="mygrp"
+                  form="@id('zk_iva') @load(vm.selectedEvent) @save(vm.selectedEvent, before='update') 
+                        @save(vm.newEvent, before='add') " height="175px" closable="false">
+            <caption label="IVA Agregar/Modificar" />
+            <vbox style="float:left; margin-left: 10px" spacing="10px">
+                <hbox spacing="50px">
+                    <label  value="Valor:"  /> 
+                    <intbox width="300px" value="@bind(zk_iva.valor)"  constraint="no empty"/>
+                    
+                </hbox>
+                <hbox spacing="31px">
+                <label  value="Nombre:"  /> 
+                <textbox width="300px" value="@bind(zk_iva.nombre)" style="float: left; " constraint="no empty" maxlength="35"/>
+                </hbox>
+                <hbox spacing="10px" >
+                    <label value="Descripción:" /> 
+                    <textbox  value="@bind(zk_iva.descripcion)" rows="2" width="300px" maxlength="100" />
+                </hbox>
+            </vbox>
+            <hlayout>
+                <label style="color:red" value="@load(vmsgs['id'])" />
+                <label style="color:red" value="@load(vmsgs['nombre'])" />
+            </hlayout>
+        </groupbox>
+        
+        
+        <listbox id="box" mold="paging" pageSize="8" multiple="true" rows="8" model="@bind(vm.events)" height="300px"
+                 selectedItem="@bind(vm.selectedEvent)">
+            <listhead>
+                <!--<listheader label="Número"  sort="auto(id)"     width="80px"/>-->
+                <listheader label="% Valor" sort="auto(valor)"  width="60px"    align="center"/>
+                <listheader label="Nombre"  sort="auto(nombre)" width="180px"/>
+                <listheader label="Descripción" />
+            </listhead>
+            <template name="model" var="zk_iva">
+                <listitem value="@load(zk_iva)">
+                    <!--<listcell label="@load(zk_iva.id)" />-->
+                    <listcell label="@load(zk_iva.valor)" />
+                    <listcell label="@load(zk_iva.nombre)" />
+                    <listcell label="@load(zk_iva.descripcion)"  />
+                </listitem>
+            </template>
+        </listbox>
+        
+    </window>
+</zk>

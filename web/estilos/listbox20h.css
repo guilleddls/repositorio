@@ -1,0 +1,43 @@
+root { 
+    display: block;
+}
+
+.z-listbox .z-listcell-cnt {
+    height: 20px;
+    overflow: hidden;
+    color: black;
+    font-size: 10pt;
+}
+
+.z-listheader 
+.z-listheader-cnt{
+    font-size: 10pt;
+}
+
+.z-menubar-hor .z-menu,
+.z-menubar-hor .z-menuitem,
+.z-menubar-hor .z-menu-btn,
+.z-menubar-hor .z-menuitem-btn,
+.z-menubar-hor span,
+.z-menubar-hor a,
+.z-menubar-hor div,
+.z-menubar-ver .z-menu,
+.z-menubar-ver .z-menuitem,
+.z-menubar-ver .z-menu-btn,
+.z-menubar-ver .z-menuitem-btn,
+.z-menubar-ver span,
+.z-menubar-ver a,
+.z-menubar-ver div,
+.z-menu-cnt, 
+.z-menuitem-cnt {
+	font-size: 11pt;
+}
+
+
+
+.hightlight { 
+	color: #1469AB; font-weight: bold; 
+}
+.error {
+	color: red; 
+}

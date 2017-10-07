@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Clinica Veterinaria"?>
+<?link rel="icon" type="image/x-icon" href="../../images/vetico.png"?>
+  
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window   
+             
+            border="normal"
+            title="REPORTE DE PRODUCTOS"
+             
+            viewModel="@id('vm') @init('com.reportes.ViewReporteClientes')"
+            apply="org.zkoss.bind.BindComposer">
+        
+        
+<hlayout>
+  <vlayout width="350px" >
+      <hlayout>
+         
+        <!--listbox id="format" 
+                 mold="select" 
+                 model="@load(vm.reportTypesModel)"
+                 selectedItem="@bind(vm.reportType)">
+        <template name="model">
+            <listitem value="@load(each)" label="@load(each.label)"></listitem>
+        </template>
+        </listbox-->
+        
+        
+        <button label="Ver Report" id="boton" onClick="@command('showProductos')"  />
+      </hlayout>
+      <button label="Proveedores" onClick="@command('verProveedores')"  />
+      <selectbox  model="@load(vm.proveedores)"
+                    selectedItem="@bind(vm.selectedProveedor)"
+                    visible="@bind(vm.verProveedor)"
+                    width="200px" 
+                    height="25px">
+            <template name="model">
+                <label value="@bind(each.nombre)" />
+            </template>
+        </selectbox>
+       <listbox id="box" multiple="true" checkmark="true" model="@load(vm.familias)" selectedItems="@bind(vm.selectedFamilias)" width="250px" >
+            <listhead>
+                <listheader label="Categoria de Productos" />
+            </listhead>
+            
+            <template name="model" var="zk_familia" value="@load(zk_familia)" >
+                <listitem>
+                    <listcell label="@load(zk_familia.nombre)"/>
+                </listitem>
+            </template>   
+
+        </listbox>
+          
+  </vlayout>
+  
+  
+ 
+    <jasperreport id="report" hflex="10" height="600px" 
+        src="@load(vm.reportConfig.source, after='showProductos')"
+        parameters="@load(vm.reportConfig.parameters, after='showProductos')"
+        type="@load(vm.reportConfig.type.value, after='showProductos')"
+        datasource="@load(vm.reportConfig.dataSource, after='showProductos')"/>
+
+</hlayout>
+</window>
+</zk>

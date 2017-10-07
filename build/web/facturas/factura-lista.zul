@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+   
+            
+          
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+           
+            boolean disabled = true;
+            
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            
+        
+        </zscript>         
+        
+        <include src="../navbar.zul"/> 
+        
+    <hlayout spacing="0" id="main"
+             apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.facturas.FacturaViewModel')"
+    >
+        
+        <zscript>
+            String ruta = "..";
+            boolean ventas = true;
+            boolean estadisticas = false, clientes = false, articulos = false, mascotas = false, proveedores = false, inicio = false, configs = false;
+            
+        </zscript>
+        <include src="../sidebar.zul"/>
+   
+   
+
+        <vlayout spacing="0" hflex="1">  
+                 <!-- INDICE DE ARRIBA -->            
+            <div sclass="breadcrumbs">
+                <div sclass="breadcrumb">
+                    <span sclass="home-heart z-icon-usd"/>
+                    <a label="Facturas" href="#"/>
+                    <label value="Listado de facturas"/>
+                </div>
+                <!-- Search input-->
+                <div sclass="nav-search">
+                    <bandbox placeholder="Buscar ..."  id="busqueda"  sclass="input-prepend"> <attribute name="onOpen"> Executions.getCurrent().sendRedirect("https://www.google.com.ar/#q="+busqueda.getValue(),"_blank");  </attribute> </bandbox>
+                </div>
+            </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <div sclass="page-header">
+                <label value="Facturas"/>
+                <a label="Gestión de Facturas" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div>
+        
+        <hlayout>
+        
+        <menubar id="menu" hflex="10" >
+            <menuitem label="Nuevo"
+                      id="add" 
+                      image="../images/nuevo.png"                       
+                      onClick="@command('add')" 
+                      tooltiptext="Nuevo"
+                      disabled="@load(empty vm.selectedCliente)"
+            />
+            <menuitem label="Generar"
+                      image="../images/page_white_text.png"
+                      onClick="@command('crearFactura')"
+                      disabled="@load(empty vm.selectedEvent)"
+            />
+            <menuitem label="Descargar"
+                      image="../images/download.png"
+                      onClick="@command('descargarFactura')"
+                      disabled="@load(empty vm.selectedEvent.ruta)"
+                      visible="@load(not empty vm.selectedEvent)"
+            />
+            
+            <menuseparator visible="@load(not empty vm.selectedEvent)" />
+            
+            <menuitem id="delete"  
+                      image="../images/delete.png" 
+                      label="Eliminar"  
+                      disabled="@load(empty vm.selectedEvent)"
+                      visible="@load(not empty vm.selectedEvent)" 
+                      tooltiptext="Eliminar"
+                      onClick="@command('delete')">
+                
+            </menuitem>
+        </menubar>
+        </hlayout>
+        <hlayout>
+        <groupbox id="mygrp" closable="false"
+                  form="@id('zk_factura') 
+                        @load(vm.selectedCliente) 
+                        @save(vm.selectedCliente, before='update') 
+                        @save(vm.newEvent, before='add')">
+
+            <div style="margin-bottom:10px; margin-top: 10px">
+                Cliente: 
+                <bandbox id="bnxProveedor" 
+                         autodrop="false" 
+                         cols="25"  
+                         value="@bind(vm.selectedCliente.fullname)"                                                            
+                         readonly="true">
+                    <attribute name="onOpen">
+                                <![CDATA[
+                                    import java.util.HashMap;
+                                    import org.zkoss.zk.ui.Component;
+                                    import org.zkoss.zk.ui.Executions;
+                                    //Map map = new HashMap();
+                                    //map.put("selectedProveedor", vm.selectedProveedor);
+                                    Executions.createComponents("factura-buscarcliente.zul", null, null);
+                                ]]>
+                    </attribute>
+                </bandbox>
+
+            </div>
+        </groupbox>
+        </hlayout>
+        <hlayout>
+        <listbox id="box" 
+                 mold="paging" 
+                 pageSize="9" 
+                 rows="9" 
+                 multiple="true" 
+                 model="@bind(vm.facturas)" 
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 emptyMessage="Ninguna factura encontrado">
+            <listhead>
+                <!--<listheader label="Id"              sort="auto(id)"         width="80px"    align="center"/>-->
+                <listheader label="Número"          sort="auto(numero)"     width="80px"    align="center"/>
+                <listheader label="Fecha"           sort="auto(fecha)"      align="center" />
+                <listheader label="Cliente"         sort="auto(cliente.nombre)"    align="left"  />
+                <listheader label="Empleado"        sort="auto(empleado.nombre)"/>
+                <listheader label="IVA"             sort="auto(ivas)"       align="right"  />
+                <listheader label="Coste"           sort="auto(coste)"      align="right"  />
+                <listheader label="Coste total"     sort="auto(costetotal)"  align="right" />
+                
+            </listhead>
+            <auxhead>
+                <!--<auxheader/>-->
+                <auxheader>
+                    <textbox value="@bind(vm.filterNumero)" 
+                             instant="true" 
+                             onCreate="@command('doSearch')"
+                             onChange="@command('doSearch')" 
+                             width="95%"/>
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFecha)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%"/>
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCliente)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%"/>
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterEmpleado)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%"/>
+                </auxheader>
+                <auxheader/>
+                <auxheader/>
+                <auxheader/>
+            </auxhead>
+            <template name="model" var="zk_factura">
+                <listitem value="@load(zk_factura)" onDoubleClick="@command('showFacturaLinea')">
+                    <!--<listcell label="@load(zk_factura.id)"/>-->
+                    <listcell label="@load(zk_factura.numero)"  context="${zk_factura.id}"/>
+                    <listcell label="@load(zk_factura.fecha)"   context="${zk_factura.id}" />
+                    <listcell label="@load(zk_factura.cliente.fullname)" context="${zk_factura.id}"/>
+                    <listcell label="@load(zk_factura.empleado.nombre)" context="${zk_factura.id}"/>
+                    <listcell label="@load(zk_factura.ivas)  @converter('formatedNumber', format='$ #,##0.00')"   context="${zk_factura.id}"/>
+                    <listcell label="@load(zk_factura.coste) @converter('formatedNumber', format='$ #,##0.00')"   context="${zk_factura.id}"/>
+                    <listcell label="@load(zk_factura.costetotal) @converter('formatedNumber', format='$ #,##0.00')"  context="${zk_factura.id}"/>
+                    
+                </listitem> 
+            </template>
+        </listbox>
+        </hlayout>
+        </vlayout>
+        </vlayout>
+    </hlayout>
+   
+</zk>

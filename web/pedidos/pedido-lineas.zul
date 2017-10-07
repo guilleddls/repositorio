@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win" 
+             title="Detalle de Pedido" 
+             border="normal"
+             apply="org.zkoss.bind.BindComposer"
+             viewModel="@id('vm') @init('com.clinica.veterinaria.pedido_linea.PedidoLineaViewModel')"
+             visible="false"
+            minimizable="false" 
+            height="620px"
+            onClose='BindUtils.postGlobalCommand(null, null, "doSearch", null)'
+            width="900px"
+            maximizable="true"
+            mode="modal"  
+            closable="true" 
+            action="hide: slideUp"
+     validationMessages="@id('vmsgs')" >
+        <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+           
+            
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else{
+                    
+                    
+                    win.setVisible(true);
+                }
+        </zscript>         
+        
+        
+        <hlayout >
+        <groupbox id="grpcli" hflex="10" 
+                  form="@id('zk_pedido') 
+                        @load(vm.selectedPedido) 
+                        @save(vm.selectedPedido, before='updatepedido') " 
+                  closable="false">
+            <caption label="Pedido" />
+            <hlayout spacing="100px">
+            <vlayout>
+                <hlayout>
+                    Número:     
+                    <intbox  cols="25" value="@bind(zk_pedido.id)"              
+                         style="margin-left:25px; margin-right: 15px"    
+                         readonly="true" />
+                </hlayout>
+                <hlayout>
+                    Proveedor:  
+                    <textbox  cols="25" 
+                          value="@bind(zk_pedido.proveedor.nombre)"    
+                          style="margin-left: 12px; margin-right: 14px" 
+                          readonly="true" />
+                    Pagado:     
+                    <checkbox checked="@bind(zk_pedido.pagado)"
+                          onCheck="@command('updatepedido')"/>
+                </hlayout>
+            </vlayout>
+            
+            <vlayout>
+                <hlayout>
+                Fecha:
+                          
+                <datebox cols="20" 
+                         value="@bind(zk_pedido.fecha)"           
+                          style=" margin-left:27px" 
+                         
+                          
+                         onChange="@command('updatepedido')" />
+                </hlayout>
+            <hlayout>
+                F. Entrega: 
+                <datebox id="fentrega" 
+                         cols="20" 
+                         value="@bind(zk_pedido.fecha_entrega)" 
+                            style="margin-left: 2px;" 
+                         onChange="@command('updatepedido')"/>
+            </hlayout>
+            <hlayout>               
+                F. Pago:   
+                <datebox id="fpago" 
+                         cols="20" 
+                         value="@bind(zk_pedido.fecha_pago)"       
+                         style="margin-left:20px"
+                         onChange="@command('updatepedido')"/>
+            </hlayout>
+            </vlayout>
+            </hlayout>       
+            
+        </groupbox>
+        </hlayout>
+        
+        <hlayout>
+<!--        <groupbox id="grpmasc" form="@id('zk_pedidolinea') @bind(vm.selectedEvent)" closable="false">-->
+        <groupbox form="@id('zk_pedidolinea') 
+                        @load(vm.selectedEvent) 
+                        @save(vm.selectedEvent, before='update') 
+                        @save(vm.newEvent, before='add')
+                        @validator(vm.validarCantidad)" 
+                  closable="false"
+                    hflex="10">
+            <caption label="Producto" />
+            <hlayout style="margin-bottom:10px" spacing="50px">
+                Código: 
+                <bandbox id="bnbxCodigo" 
+                         autodrop="false" 
+                         cols="25" 
+                         value="@bind(vm.selectedEvent.producto.codigo)"     
+                         style="margin-left:11px; margin-right: 10px"    
+                          
+                         readonly="true">
+                    <attribute name="onOpen">
+                                <![CDATA[
+                                    import java.util.HashMap;
+                                    import org.zkoss.zk.ui.Component;
+                                    import org.zkoss.zk.ui.Executions;
+                                    Map map = new HashMap();
+                                    map.put("selectedPedido", vm.selectedPedido);
+                                    System.out.println("selectedPedido: " + vm.selectedPedido.getProveedor().getNombre());
+                                    vm.send();
+                                    Executions.createComponents("pedidos/pedido-buscarproducto.zul", null, map);
+                                ]]>
+                    </attribute>
+                </bandbox>
+            
+               Cantidad: 
+               <intbox  id="inbCantidad"                  
+                        cols="25"
+                        width="170px"
+                        value="@bind(zk_pedidolinea.cantidad)"              
+                        style="margin-left: 2px; margin-right: 15px"     
+                        
+                        onChange="@command('update')"
+                        onOK="@command('update')"
+                        errorMessage="@load(vmsgs.cantidad)"
+                        />
+            </hlayout>
+        </groupbox>
+        </hlayout>
+        
+        <separator spacing="5px"/>
+        <menubar id="menu" >
+            <!--menuitem image="images/goback.png" onClick='Executions.sendRedirect("pedido-template.zul")' label="Atrás"/-->
+            <!--<menuitem id="update"   image="images/guardar.png"   label="Guardar"     onClick="@command('update')" />-->
+            <menuseparator />
+            <!--<menuitem id="activar"  image="images/modificar.png" label="Modificar"   onClick="Activar()"/>-->
+            <menuitem id="delete"   
+                      image="images/delete.png"    
+                      label="Eliminar"    
+                      onClick="@command('delete')" 
+                      disabled="@load(empty vm.selectedEvent)"/>
+        </menubar>
+        <hlayout>
+        <listbox id="box" hflex="10"
+                 mold="paging" 
+                 pageSize="9" 
+                 rows="9" 
+                 multiple="true"  
+                 model="@load(vm.pedidolineas)" 
+                 selectedItem="@bind(vm.selectedEvent)" >
+            <listhead>
+                <listheader label="Código"      sort="auto(producto.codigo)" width="150px"/>
+                <listheader label="Nombre"      sort="auto(producto.nombre)" />
+                <listheader label="Descripción" sort="auto(producto.descripcion)" />
+                <listheader label="Cantidad"    sort="auto(cantidad)"           width="100px" align="right"/>
+                <listheader label="Precio"      sort="auto(producto.precio)"    width="100px" align="right"/>
+                <listheader label="Precio total"   width="120px" align="right" />
+            </listhead>
+            <template name="model" var="zk_pedidolinea">
+                <listitem value="@load(zk_pedidolinea)">
+                    <listcell label="@load(zk_pedidolinea.producto.codigo)" />
+                    <listcell label="@load(zk_pedidolinea.producto.nombre)" />
+                    <listcell label="@load(zk_pedidolinea.producto.descripcion)" if="${zk_pedidolinea.producto.descripcion != 'null'}"/>
+                    <listcell label="" if="${zk_pedidolinea.producto.descripcion == 'null'}"/>
+                    <listcell label="@load(zk_pedidolinea.cantidad)" />
+                    <listcell label="@load(zk_pedidolinea.producto.precio) @converter('formatedNumber', format='$ #,##0.00')" />
+                    <listcell label="@load(zk_pedidolinea.costetotal) @converter('formatedNumber', format='$ #,##0.00')" />
+                </listitem>
+            </template>
+        </listbox>
+        </hlayout>
+        
+    </window>
+</zk>

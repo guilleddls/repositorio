@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Clinica Veterinaria"?>
+<?link href="css/bootstrap.css" rel="stylesheet" type="text/css"?>
+<?link href="css/fonts.css" rel="stylesheet" type="text/css"?>
+<?link href="css/index.css.dsp" rel="stylesheet" type="text/css"?>
+<?link rel="icon" type="image/x-icon" href="/images/vetico.png"?>
+
+<?init class="com.clinica.veterinaria.inicio.AuthenticateInit"?>
+
+<zk xmlns:n="native">
+    <!-- BARRA DE ARRIBA-->
+   <script type="text/javascript" src="/js/jquery.maskedinput.min.js" />
+    <zscript>
+        <![CDATA[
+            import com.clinica.veterinaria.user.UserCredentialManager;
+            import org.zkoss.zk.ui.Executions;
+            import org.zkoss.zk.ui.Sessions;
+            import org.zkoss.bind.annotation.Init;
+            
+            void logout() {       
+                Sessions.getCurrent().invalidate();
+                Executions.sendRedirect("index.zul");
+            }
+
+            String contenido ="";
+            boolean[] marcadores = marcadores = com.clinica.veterinaria.inicio.InicioVM.getMarcador("");
+            
+           // <?init class="com.clinica.veterinaria.inicio.AuthenticateInit"?>
+           // if(!UserCredentialManager.getIntance(Sessions.getCurrent()).isAuthenticated()) Executions.sendRedirect("index.zul");            else{
+                    //if(UserCredentialManager.getIntance(session).getRol() == 1){ }
+                   Object o = Executions.getCurrent().getParameter("ref");
+                  
+                   if(o != null) {
+                        contenido = String.valueOf(o);
+                        marcadores = com.clinica.veterinaria.inicio.InicioVM.getMarcador(contenido);
+                        
+                   }
+                   
+                   contenido = com.clinica.veterinaria.inicio.InicioVM.fillPrincipal(contenido);
+           // }
+          ]]>
+        </zscript>
+    
+    
+    <include src="navbar.zul"/>             
+	
+    <hlayout id="main" spacing="0" >
+    <!-- BARRA DEL COSTADO -->
+       
+        <include src="sidebar.zul"/>
+            <div id="contenido" hflex="10" >
+
+
+
+                    <!-- WEB CONTENT -->
+                <include src="${contenido}"/>
+
+
+            </div>
+    </hlayout>
+
+	
+   
+</zk>

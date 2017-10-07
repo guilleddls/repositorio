@@ -1,0 +1,92 @@
+   <div   apply="org.zkoss.bind.BindComposer"
+             viewModel="@id('vm') @init('com.clinica.veterinaria.servicios.ServicioViewModel')">
+        
+
+        <vlayout spacing="0" hflex="1">  
+                 <!-- INDICE DE ARRIBA -->            
+            <div sclass="breadcrumbs">
+                <div sclass="breadcrumb">
+                    <span sclass="home-flask z-icon-flask"/>
+                    <a label="Servicio" href="#"/>
+                    <label value="Listado de Servicios"/>
+                </div>
+                <!-- Search input-->
+                <include src="/content/search.zul"/>
+            </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <div sclass="page-header">
+                <label value="Servicios"/>
+                <a label="Busqueda de Servicios" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div>
+        
+        <hlayout>
+        
+        <menubar id="menu" hflex="10">
+            <menuitem id="add"
+                      image="/images/nuevo.png"
+                      label="Nuevo"
+                      onClick="@command('addservicio')"
+                      tooltiptext="Nuevo"/>
+            <menuseparator visible="@load(not empty vm.selectedEvent)" />
+            <menuitem id="delete"  
+                      image="images/delete.png" 
+                      label="Eliminar"
+                      visible="@load(not empty vm.selectedEvent)"
+                      disabled="@load(empty vm.selectedEvent)"
+                      tooltiptext="Eliminar"
+                      onClick="@command('delete')">
+                
+            </menuitem>
+        </menubar>
+        </hlayout>
+        <hlayout>
+        <listbox id="box"
+                 mold="paging"
+                 pageSize="10"
+                 multiple="true"
+                 rows="10"
+                 model="@load(vm.events)"
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 emptyMessage="Ningún servicio encontrado">
+            <listhead>
+                <listheader label="Código"      sort="auto(codigo)"     width="100px"  />
+                <listheader label="Servicio"    sort="auto(nombre)"     width="250px" />
+                <listheader label="Familia"     sort="auto(familia.nombre)"     width="250px" />
+                <listheader label="IVA"         sort="auto(iva.valor)"  width="80px"  align="center"/>
+                <listheader label="Precio"      sort="auto(precio)"     width="150px" align="right"/>
+                <listheader label="Descripción" />
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCodigo)" instant="true" onChange="@command('doSearch')" onCreate="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterNombre)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFamilia)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterIva)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader/>
+                <auxheader/>
+            </auxhead>
+            <template name="model" var="zk_servicio">
+                <listitem value="@load(zk_servicio)" onDoubleClick="@command('modificarServicio')">
+                    <listcell label="@load(zk_servicio.codigo)" />
+                    <listcell label="@load(zk_servicio.nombre)" />
+                    <listcell label="@load(zk_servicio.familia.nombre)" />
+                    <listcell label="@load(zk_servicio.iva.valor)" />
+                    <listcell label="@load(zk_servicio.precio) @converter('formatedNumber', format='$ #,##0.00')" />
+                    <listcell label="@load(zk_servicio.descripcion)"  if="${zk_servicio.descripcion != 'null'}"/>
+                    <listcell label=""  if="${zk_servicio.descripcion == 'null'}"/>
+                </listitem>
+            </template>
+        </listbox>
+        </hlayout>
+        </vlayout>
+        </vlayout>
+   </div>

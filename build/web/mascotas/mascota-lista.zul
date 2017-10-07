@@ -1,0 +1,191 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+
+<zk xmlns:n="native" >
+    
+            
+           
+        <zscript>
+            <![CDATA[
+                import org.zkoss.zk.ui.*;
+                import com.clinica.veterinaria.user.*;
+
+                Session s = Sessions.getCurrent();
+                
+
+                void logout() {
+                    s.invalidate();
+                    Executions.sendRedirect("../index.zul");
+                }
+
+                if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                    Executions.sendRedirect("../index.zul");
+                
+            ]]>
+        </zscript>
+        
+    <include src="../navbar.zul"/> 
+        
+    <hlayout spacing="0" id="main"
+         apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.mascotas.MascotaViewModel')">
+        
+        <zscript>
+            String ruta = "..";
+            boolean mascotas = true;
+            boolean estadisticas = false, clientes = false, articulos = false, ventas = false, proveedores = false, inicio = false, configs = false;
+            
+        </zscript>
+        <include src="../sidebar.zul"/>
+   
+   
+
+        <vlayout spacing="0" hflex="1">  
+                 <!-- INDICE DE ARRIBA -->            
+            <div sclass="breadcrumbs">
+                <div sclass="breadcrumb">
+                    <span sclass="home-heart z-icon-heart"/>
+                    <a label="Mascotas" href="#"/>
+                    <label value="Listado de Mascotas"/>
+                </div>
+                <!-- Search input-->
+                <div sclass="nav-search">
+                    <bandbox placeholder="Buscar ..."  id="busqueda"  sclass="input-prepend"> <attribute name="onOpen"> Executions.getCurrent().sendRedirect("https://www.google.com.ar/#q="+busqueda.getValue(),"_blank");  </attribute> </bandbox>
+                </div>
+            </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <div sclass="page-header">
+                <label value="Mascotas"/>
+                <a label="Busqueda de Mascotas" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div>
+        
+        <hlayout>
+        
+        <menubar id="menu" hflex="10">
+            <menuitem label="Mostrar Datos"              
+                        onClick="@command('showMascota')"
+                        image="../images/page_go.png" 
+                        disabled="@load(empty vm.selectedEvent)"/>
+            
+            <menuitem label="Ver Pesos"
+                        onClick="@command('mostrarPeso')" 
+                        image="../images/weight.png"
+                        disabled="@load(empty vm.selectedEvent)"/>
+            
+            <menuitem id="delete"  
+                      image="../images/delete.png" 
+                      label="Eliminar"   
+                      disabled="@load(empty vm.selectedEvent)"
+                      tooltiptext="Eliminar"
+                      onClick="@command('delete')">
+                
+            </menuitem>
+       </menubar>
+        </hlayout>
+        <hlayout>
+        
+        <listbox id="box" 
+                 mold="paging"
+                 pageSize="10" 
+                 rows="10" 
+                 model="@bind(vm.mascotas)" 
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 emptyMessage="Ninguna mascota encontrada">
+            <listhead>
+                <listheader label="Nº Cod."          sort="auto(chip)"              width="100px" />
+                <listheader label="Nombre"           sort="auto(nombre)"            width="150px" />
+                <listheader label="Propietario"      sort="auto(cliente.fullname)"  width="180px" />
+                <listheader label="Sexo"             sort="auto(sexo)"              width="100px" />
+                <listheader label="F. Nacimiento"    sort="auto(nacimiento)"        width="100px" />
+                <listheader label="F. Defuncion"     sort="auto(defuncion)"         width="100px" />
+                <!--<listheader label="Peso (kg)"        sort="auto(peso)" align="center"/>-->
+                <!--<listheader label="Altura (cm)"      sort="auto(altura)" align="center"/>-->
+                <listheader label="Raza"             sort="auto(raza.raza)"         width="150px" />
+                <listheader label="Especie"          sort="auto(especie.especie)"   width="120px" />
+                <!--<listheader label="Pelo"             sort="auto(pelo)" />-->
+                <listheader label="Fecha Alta"       sort="auto(fechaalta)"         width="120px" />
+                <listheader label="Fecha Baja"       sort="auto(fechabaja)"         width="120px" />
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterChip)" instant="true" onChange="@command('doSearch')" onCreate="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterNombre)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterPropietario)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterSexo)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFnacimiento)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFdefuncion)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+<!--                <auxheader>
+                    <textbox value="@bind(vm.filterPeso)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>-->
+<!--                <auxheader>
+                    <textbox value="@bind(vm.filterAltura)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>-->
+                <auxheader>
+                    <textbox value="@bind(vm.filterRaza)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterEspecie)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+<!--                <auxheader>
+                    <textbox value="@bind(vm.filterPelo)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>-->
+                <auxheader>
+                    <textbox value="@bind(vm.filterFechaalta)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFechabaja)" instant="true" onChange="@command('doSearch')" width="95%" />
+                </auxheader>
+            </auxhead>
+            <template name="model" var="zk_mascota">
+                <listitem value="@load(zk_mascota)" onDoubleClick="@command('showMascota')" >
+                    <listcell label="@load(zk_mascota.chip)"   context="${zk_mascota.chip}"> 
+                        <menupopup id="${zk_mascota.chip}">
+                            <menuitem label="Ir a"              
+                                      onClick="@command('showMascota')"
+                                      src="../images/page_go.png"
+                                      
+                            />
+                            <menuitem label="Ver Pesos"
+                                      onClick="@command('mostrarPeso')" 
+                                      src="../images/weight.png"/>
+                            <!--<menuitem label="Ir a Historial"    onClick="@command('showHistorial')" />-->
+                            <!-- Obsoleto, se pasa a su perfil
+                            <menuitem label="Modificar" href="mascota-nuevo.zul?chip=${zk_mascota.chip}"  />-->
+                        </menupopup>
+                    </listcell>
+                    <listcell label="@load(zk_mascota.nombre)"          context="${zk_mascota.chip}"/>
+                    <listcell label="@load(zk_mascota.cliente.fullname)"  context="${zk_mascota.chip}"/>
+                    <listcell label="@load(zk_mascota.sexo)"            context="${zk_mascota.chip}"  if="${zk_mascota.sexo == 'Macho'}"  src="/images/male.png" />
+                    <listcell label="@load(zk_mascota.sexo)"            context="${zk_mascota.chip}"  if="${zk_mascota.sexo == 'Hembra'}"  src="/images/female.png" />
+                    <listcell label="@load(zk_mascota.nacimiento)"      context="${zk_mascota.chip}"/>
+                    <listcell label="@load(zk_mascota.defuncion)"       context="${zk_mascota.chip}"/>
+                    <!--<listcell label="@load(zk_mascota.peso) @converter('formatedNumber', format='###,##')"            context="${zk_mascota.chip}"/>-->
+                    <!--<listcell label="@load(zk_mascota.altura) @converter('formatedNumber', format='###,##')"          context="${zk_mascota.chip}"/>-->
+                    <listcell label="@load(zk_mascota.raza.raza)"       context="${zk_mascota.chip}"/>
+                    <listcell label="@load(zk_mascota.especie.especie)" context="${zk_mascota.chip}"/>
+                    <!--<listcell label="@load(zk_mascota.pelo)"            context="${zk_mascota.chip}"/>-->
+                    <listcell label="@load(zk_mascota.fechaalta)"       context="${zk_mascota.chip}"/>
+                    <listcell label="@load(zk_mascota.fechabaja)"       context="${zk_mascota.chip}"/>
+                </listitem>
+            </template>
+        </listbox>
+        </hlayout>
+        </vlayout>
+        </vlayout>
+    </hlayout>
+   
+</zk>

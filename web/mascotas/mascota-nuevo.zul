@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     <window id="win" title="Mascota Nueva" border="normal"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.mascotas.MascotaViewModel')"
+            validationMessages="@id('vmsgs')" visible="false">
+      <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+
+                
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("index.zul");
+            else
+                win.setVisible(true);
+                
+        </zscript>
+        <div>
+            <style src="/estilos/listbox20h.css" />
+            <include src="menu.zul"/>
+        </div>
+        
+  
+        <grid id="mygrp"
+              form="@id('zk_mascota') @load(vm.selectedEvent) 
+                    
+                    @save(vm.newEvent, before='add') 
+                    @validator('com.clinica.veterinaria.mascotas.MascotaValidator')">
+            <menubar id="menu" >
+                <button id="add" label="Guardar" image="images/guardar.png"  
+                          onClick="@command('add')" 
+                          autodisable="+self, +txtChip, +txtNombre, +dateNac, +doublePeso, +doubleAltura, +txtEspecie, +txtPelo"/>
+            </menubar>
+            <columns>
+                <column label="Datos Mascota" width="150px" />
+                <column label=""  width="200px" />
+            </columns>
+            <rows>
+                <row>
+                    Nº Cod. *
+                    <textbox id="txtChip" cols="25" value="@save(zk_mascota.chip)" constraint="no empty"/>
+                </row>
+                <row>
+                    Nombre *
+                    <textbox id="txtNombre" cols="25" value="@save(zk_mascota.nombre)" constraint="no empty" />
+                </row>
+                <row>
+                    Fecha nacimiento:
+                    <hlayout>
+                        <datebox id="dateNac" format="dd/MM/yyyy" value="@save(zk_mascota.nacimiento)"/>
+                    </hlayout>
+                </row>
+                <row>
+                    Sexo *
+                    <listbox id="txtSexo" rows="1" mold="select" selectedItem="@save(zk_mascota.sexo)" constraint="no empty">
+                        <listitem label="Macho" value="0"/>
+                        <listitem label="Hembra" value="1"/>
+                    </listbox>
+                </row>
+                <row>
+                    Peso
+                    <doublebox id="doublePeso" cols="25" value="@save(zk_mascota.peso)"  />
+                </row>
+                <row>
+                    Altura
+                    <doublebox id="doubleAltura"  cols="25" value="@save(zk_mascota.altura)" />
+                </row>
+                
+                <row>
+                    Especie
+                    <selectbox id="txtEspecie" model="@load(vm.especies)" selectedItem="@bind(zk_mascota.especie)" >
+                        <template name="model">
+                            <label value="@bind(each)" />
+                        </template>
+                    </selectbox>
+                </row>
+                <row>
+                    Pelo                     
+                    <listbox id="txtPelo" rows="1" mold="select" selectedItem="@save(zk_mascota.pelo)" >
+                        <listitem label="Corto" value="Corto" />
+                        <listitem label="Largo" value="Largo" />
+                        <listitem label="Duro"  value="Duro" />
+                        <listitem label="Medio" value="Medio" />
+                        <listitem label="Medio-largo" value="Medio-largo" />
+                        <listitem label="Propio" value="Propio" />
+                        <listitem label="Rizado" value="Rizado" />
+                    </listbox>
+                </row>
+                <row>
+                    Observaciones:
+                    <hlayout>
+                        <textbox id="txtObs" rows="3" width="250px" value="@save(zk_mascota.observ)"/>
+                    </hlayout>
+                </row>
+            </rows>
+        </grid>
+    </window>
+</zk>

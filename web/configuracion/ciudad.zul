@@ -1,0 +1,155 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window id="winnuevaciudad" 
+            title="Ciudad Nueva" 
+            border="normal"
+            width="400px" 
+            height="590px" 
+            minimizable="false" 
+            maximizable="false"
+            mode="modal"  
+            closable="true" 
+            action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.poblaciones.PoblacionViewModel')"
+            validationMessages="@id('vmsgs')">    
+        
+        
+        <zscript>
+             <![CDATA[
+            public void funcion(){
+                validProvincia.setVisible(false);
+                validCiudad.setVisible(false);
+
+                for(int i =0; i< cmbProvincia.getModel().getSize(); i++){
+                    if(vm.selectedEvent.getProv().getProvincia().equals(cmbProvincia.getModel().getElementAt(i).toString())){
+                        update.setDisabled(false);
+                        cmbProvincia.setSelectedIndex(i);
+                        
+                        break;
+                    }
+                }          
+            }
+             ]]>
+        </zscript>  
+        
+        <menubar id="menu" >
+            <menuitem id="add"    image="/images/nuevo.png"   label="Nuevo" onClick="@command('add', cmp=cmbProvincia)" tooltiptext="Nueva Ciudad">
+                <attribute name="onClick">
+                    <![CDATA[
+                    if(cmbProvincia.getSelectedIndex()>-1 && 
+                        !txtCiudad.getValue().equals(""))
+                    {
+                        update.setDisabled(true);
+                        cmbProvincia.setSelectedIndex(-1);
+                        txtCiudad.setValue("");
+                        validProvincia.setVisible(false);
+                        validCiudad.setVisible(false);
+                    }else{
+                        validProvincia.setVisible(cmbProvincia.getSelectedIndex()<0); 
+                        validCiudad.setVisible(txtCiudad.getValue().isEmpty());
+                        
+                    }
+                    ]]>
+                </attribute>
+            </menuitem>
+            <menuitem id="update" image="/images/guardar.png" label="Modificar" onClick="@command('update', cmp=cmbProvincia)" disabled="@load(empty vm.selectedEvent)" tooltiptext="Modificar Ciudad" >
+                <attribute name="onClick">
+                    <![CDATA[
+                    if(cmbProvincia.getSelectedIndex()>-1 && !txtCiudad.getValue().isEmpty()){
+                        update.setDisabled(true);
+                        
+                        validProvincia.setVisible(false);
+                        validCiudad.setVisible(false);
+                    }else{
+                        validProvincia.setVisible(cmbProvincia.getSelectedIndex()<0); 
+                        validCiudad.setVisible(txtCiudad.getValue().isEmpty());
+                        
+                    }
+                ]]>
+                </attribute>
+            </menuitem>
+        </menubar>
+
+        <groupbox id="mygrp" 
+              form="@id('zk_poblacion') 
+                    @load(vm.selectedEvent) 
+                    @save(vm.selectedEvent, before='update') 
+                    @save(vm.newEvent, before='add') " 
+                   
+                  closable="false">
+            
+            <caption label="Ciudad Agregar/Modificar" />
+           
+            <grid >
+                <columns >
+                    <column value="" width="100px"/>
+                    <column/>
+                </columns>
+                <rows >
+                <row>
+                    <label value="Ciudad *:"  />
+                    <textbox id="txtCiudad" 
+                             cols="25" 
+                             value="@bind(zk_poblacion.poblacion)" 
+                             width="200px"
+                             maxlength="25"
+                              />
+                </row>
+                
+                
+                
+                <row >
+                    <label value="Provincia *:"  />
+                    <selectbox id="cmbProvincia" 
+                               model="@load(vm.provincias)" 
+                               selectedItem="@bind(zk_poblacion.prov)"  
+                               height="25px"
+                               width="200px">
+                        <template name="model">
+                            <label value="@bind(each.provincia)" /> 
+                        </template>
+                    </selectbox>
+                </row>
+                </rows>
+            </grid>
+        
+       
+       
+         </groupbox>
+         
+         <hlayout>
+                <label id="validProvincia" style="color:red" value="Seleccione una provincia" visible="false" />
+        </hlayout>
+        <hlayout>
+                <label id="validCiudad" style="color:red" value="Ingrese una ciudad" visible="false"/>
+        </hlayout>
+         <separator spacing="10px"/> 
+         
+         <listbox id="box" 
+                 mold="paging" 
+                 pageSize="10"
+                 rows="10" 
+                style="overflow:auto;"
+                
+                
+                 model="@bind(vm.events)" 
+                 selectedItem="@bind(vm.selectedEvent)"  >
+            <listhead >
+                
+                <listheader label="Ciudad" sort="auto(poblacion)" />
+                <listheader label="Provincia" sort="auto(prov.provincia)" />
+            </listhead>
+            <template name="model" var="zk_poblacion" >
+                <listitem value="@load(zk_poblacion)" onClick="funcion()" >
+                    
+                    <listcell label="@load(zk_poblacion.poblacion)"  />
+                    <listcell label="@load(zk_poblacion.prov.provincia) "  />
+                    
+                </listitem>
+            </template>
+        </listbox>
+         
+    </window>
+</zk>

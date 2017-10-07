@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?link href="css/bootstrap.css" rel="stylesheet" type="text/css"?>
+<?link href="css/fonts.css" rel="stylesheet" type="text/css"?>
+<?link href="css/index.css.dsp" rel="stylesheet" type="text/css"?>
+
+<?link rel="icon" type="image/x-icon" href="/images/vetico.png"?>
+<?page title="Gestión Clínica Veterinaria - Login"?>
+<zk xmlns="http://www.zkoss.org/2005/zul">
+
+<style>
+    body { 
+        padding: 0 0; 
+        background-image: url('bg1.png'); 
+        background-repeat:repeat; 
+    }
+</style>
+    
+<div>
+<window id="loginWin" border="normal" width="470px" height="230px" 
+    title="Veterinaria San Carlos"
+    apply="com.clinica.veterinaria.user.LoginViewModel" 
+    mode="overlapped"
+    visible="false" 
+        contentStyle="background:#F7F7F7"
+position="center,center">
+    
+    
+    <caption image="images/vetico.png" label="Login"/>
+    
+    <image src="logoUTN.png" width="100px" height="100px" style="float:left; margin-right: 10px; margin-top:20px;"/> 
+    <panel border="normal" width="320px" style="margin-top:25px;" >
+        
+        <panelchildren style=" background:#F7F7F7" >
+            <vlayout  >
+                <separator spacing="5px"/>
+                <div style="margin-left:40px; "> 
+                    
+                 <hbox spacing="10px">         
+                     <!--span sclass="z-icon-user" style="margin-top:7px" /--> 
+                     <image src="/images/user-icon.png" width="30px" height="30px" />
+                     <textbox id="nameTxb" width="200px" placeholder="Nombre de Usuario" height="30px" />
+                 </hbox>
+                     <separator spacing="10px"/>
+                 <hbox spacing="7px"> 
+                     <!--span sclass="z-icon-key" style="margin-top:7px"/--> 
+                     <image src="/images/pass-icon.png" width="30px" height="30px" style="margin-right:3px" />
+                     <textbox id="passwordTxb"  type="password"  width="200px" placeholder="Contraseña Personal" height="30px"/>
+                 </hbox>
+                 <separator spacing="10px"/>
+                </div>
+            </vlayout>
+        </panelchildren>
+        
+    </panel>
+        <button id="confirmBtn" image="images/key.png" label="Ingresar" mold="trendy" style="float:right; margin:10px; margin-right: 15px;padding:8px"/>
+  
+    <label id="mesgLbl"/>
+</window>
+</div>
+</zk>

@@ -1,0 +1,90 @@
+<panel border="none" collapsible="true" sclass="transparent" open="false" 
+            apply="org.zkoss.bind.BindComposer" 
+            viewModel="@id('vm') @init('com.clinica.veterinaria.citas.CitaViewModel')"
+           
+>
+  <caption iconSclass="z-icon-star orange" label="Proximos turnos (7 dias)"/>
+    <panelchildren>
+                <listbox id="box" 
+                         mold="paging" 
+                         pageSize="16" 
+                         rows="10" 
+                         emptyMessage="No hay proximas citas"
+                         model="@bind(vm.avisoCita)" 
+                         selectedItem="@bind(vm.selectedEvent)" 
+                         height="300px">
+                    <listhead>
+                        <listheader label="Estado" sort="auto(estado)" width="90px" align="center"/>
+                        <listheader label="Fecha"       sort="auto(fecha)"  width="80px" />
+                        <listheader label="Hora"        sort="auto(hora)"   width="70px"/>
+                        <listheader label="Cliente"     sort="auto(cliente.fullname)"   />
+                        <listheader label="Servicio"     sort="auto(servicio.nombre)"   />
+                        <listheader label="Teléfono"    width="80px"/>
+                        <listheader label="Mascota"     sort="auto(mascota.nombre)" width="90px"/>
+                   </listhead>
+                   <template name="model" var="zk_cita">
+                        <listitem value="@load(zk_cita)">
+                            <listcell label="Avisado"   tooltiptext="Avisado"    if="${zk_cita.estado == '3'}" src="/images/telephone.png" context="${zk_cita.id}"/> <!-- CANCELADO -->
+                            <listcell label="Cancelado" tooltiptext="Cancelado"  if="${zk_cita.estado == '0'}" src="/images/delete_1.png" context="${zk_cita.id}"/> <!-- CANCELADO -->
+                            <listcell label="Acudido"   tooltiptext="Acudido"    if="${zk_cita.estado == '1'}" src="/images/accept.png" context="${zk_cita.id}"/> <!-- ACUDIDO -->
+                            <listcell label="Pendiente" tooltiptext="Pendiente"  if="${zk_cita.estado == '2'}" src="/images/error.png" context="${zk_cita.id}"/> <!-- PENDIENTE -->
+                            <listcell label="@load(zk_cita.fecha)" context="${zk_cita.id}">
+                                <menupopup id="${zk_cita.id}">
+                                    <menu label="Cambiar estado" src="/images/sync.png" >
+                                        <menupopup>
+                                            <menuitem label="Avisado"  src="/images/telephone.png"  onClick="@command('avisadoCita')" />
+                                            <menuitem label="Acudido"   src="/images/accept.png"    onClick="@command('acudidoCita')"/>
+                                            <menuitem label="Pendiente" src="/images/error.png"     onClick="@command('pendienteCita')" />
+                                            <menuitem label="Cancelar"  src="/images/delete_1.png"  onClick="@command('canceladoCita')" />
+                                        </menupopup>
+                                    </menu>
+                                </menupopup>
+                            </listcell>
+                            <listcell label="@load(zk_cita.hora)"  context="${zk_cita.id}"/>
+                            <listcell label="@load(zk_cita.cliente.fullname)" context="${zk_cita.id}" />
+                            <listcell label="@load(zk_cita.servicio.nombre)"  if="${zk_cita.servicio != null}" context="${zk_cita.id}"/>
+                    <listcell label=""  if="${zk_cita.servicio == null}" context="${zk_cita.id}"/>
+                            <listcell label="@load(zk_cita.cliente.telefono)" context="${zk_cita.id}" />
+                            <listcell label="@load(zk_cita.mascota.nombre)"  context="${zk_cita.id}" />
+                        </listitem>
+                   </template>
+               </listbox>
+            </panelchildren>
+  
+  <!--panelchildren>
+    <grid sclass="domain">
+      <columns>
+        <column label="name" iconSclass="z-icon-caret-right blue"/>
+        <column label="price" iconSclass="z-icon-caret-right blue"/>
+        <column label="status" iconSclass="z-icon-caret-right blue"/>
+      </columns>
+      <rows>
+        <row>
+          <label value="Columna 1"/>
+          <div><label sclass="red" value="$29.99"/><label sclass="green" value="$19.99"/></div>
+          <label value="onsale" sclass="label label-info arrowed-right arrowed-in"/>
+        </row>
+        <row>
+          <label value="Columna1"/>
+          <label sclass="green" value="$16.45"/>
+          <label value="approved" sclass="label label-success arrowed-in arrowed-in-right"/>
+        </row>
+        <row>
+          <label value="Columna1"/>
+          <label sclass="green" value="$15.00"/>
+          <label value="pending" sclass="label label-danger arrowed"/>
+        </row>
+        <row>
+          <label value="Columna1"/>
+          <div><label sclass="red" value="$24.99"/><label sclass="green" value="$19.95"/></div>
+          <label value="out of stock" sclass="label arrowed" style="text-decoration:line-through;"/>
+        </row>
+        <row>
+          <label value="Columna1"/>
+          <label sclass="green" value="$12.00"/>
+          <label value="SOLD" sclass="label label-warning arrowed arrowed-right"/>
+        </row>
+      </rows>
+    </grid>
+  </panelchildren-->
+</panel>

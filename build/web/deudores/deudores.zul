@@ -1,0 +1,74 @@
+<zk>
+  
+<div apply="org.zkoss.bind.BindComposer"
+     viewModel="@id('vm') @init('com.clinica.veterinaria.clientes.ClienteViewModel')">
+    
+    <vlayout spacing="0" hflex="1">  
+     <!-- INDICE DE ARRIBA -->            
+        <div sclass="breadcrumbs">
+            <div sclass="breadcrumb">
+                <span sclass="home-user z-icon-user"/>
+                <a label="Clientes" href="#"/>
+                <label value="Gestión de Deudores"/>
+            </div>
+            <!-- Search input-->
+            <include src="/content/search.zul"/>
+        </div>
+           
+    <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+    <!-- Inicio de la barra de menu -->
+    <hlayout >
+        <menubar hflex="10">
+                <menuitem label="Nueva Boleta" onClick='Executions.createComponents("/deudores/venta-linea.zul",null,null)' image="images/nuevo.png" tooltiptext="Nuevo"/>
+                <menuseparator />
+                <menuitem label="Mostrar Datos" onClick="@command('showDeudor')" image="images/page_go.png"  />
+                <!--menuitem label="Eliminar" onClick="" image="images/delete.png" disabled="@load(empty vm.selectedEvent)" tooltiptext="Eliminar" disabled="@load(empty vm.selectedEvent)" /--> 
+                <menuseparator />
+                
+        </menubar>
+    </hlayout>
+    <!-- Fin de la barra de menu -->
+
+
+    <!-- Inicio lista de deudores -->
+    <hlayout>
+        <listbox model="@load(vm.clientes)" selectedItem="@bind(vm.selectedEvent)" id="box" mold="paging" pageSize="15" rows="15" emptyMessage="Ningún cliente encontrado" hflex="10">
+
+            <listhead>
+                <listheader label="Nombre"      sort="auto(nombre)"             width="200px"/>
+                <listheader label="Apellido"    sort="auto(apellidos)"          width="200px"/>
+                <listheader label="Ciudad"      sort="auto(ciudad.poblacion)"   width="175px"/>
+                <listheader label="Dirección"   sort="auto(direccion)"          width="175px"/>
+                <listheader label="Boletas"     sort="auto(boletasImpagas)"     width="100px" />
+                <listheader label="Saldo"       sort="auto(saldoDeudor)"        width="150px" />
+            </listhead>
+
+            <auxhead>
+                <auxheader> <textbox value="@bind(vm.filterNombre)"     instant="true" onChange="@command('doSearchDeudores')"    width="95%" onCreate="@command('doSearchDeudores')"/> </auxheader>
+                <auxheader> <textbox value="@bind(vm.filterApellidos)"  instant="true" onChange="@command('doSearchDeudores')"    width="95%" /> </auxheader>
+                <auxheader> <textbox value="@bind(vm.filterCiudad)"     instant="true" onChange="@command('doSearchDeudores')"    width="95%"/> </auxheader>
+                <auxheader> <textbox value="@bind(vm.filterDireccion)"  instant="true" onChange="@command('doSearchDeudores')"    width="95%" /> </auxheader>
+                <auxheader> <textbox value="@bind(vm.filterBoletasImpagas)"  instant="true" onChange="@command('doSearchDeudores')"    width="95%" /> </auxheader>
+                <auxheader> <textbox value="@bind(vm.filterSaldoDeudor)" instant="true" onChange="@command('doSearchDeudores')"   width="95%" /> </auxheader>
+            </auxhead>
+
+            <template name="model" var="zk_cliente">
+                <listitem value="@load(zk_cliente)" onDoubleClick="@command('showDeudor')">
+                    <listcell label="@load(zk_cliente.nombre)"/>
+                    <listcell label="@load(zk_cliente.apellidos)"/>
+                    <listcell label="@load(zk_cliente.ciudad.poblacion)"/>
+                    <listcell label="@load(zk_cliente.direccion)"/>
+                    <listcell label="@load(zk_cliente.boletasImpagas)"/>
+                    <listcell label="@load(zk_cliente.saldoDeudor) @converter('formatedNumber', format='$ #,##0.00')" style="color: red"/>
+                </listitem>
+            </template>
+        </listbox>
+    </hlayout>
+    </vlayout>
+    </vlayout> 
+<!-- Fin lista deudores -->
+</div>
+
+        
+
+</zk>

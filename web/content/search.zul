@@ -1,0 +1,11 @@
+<div sclass="nav-search" >
+    <bandbox
+        id="busqueda"  
+        placeholder="Buscar ..."
+        sclass="input-prepend" 
+        autodrop="false"
+        value=""
+        onOK='Executions.getCurrent().sendRedirect("https://www.google.com.ar/#q="+busqueda.getValue(),"_blank") ' 
+        onOpen='Executions.getCurrent().sendRedirect("https://www.google.com.ar/#q="+busqueda.getValue(),"_blank") '>
+    </bandbox>
+</div>

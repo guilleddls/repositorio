@@ -1,0 +1,145 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul">
+    <window
+        id="ivaVentana"
+        title="@load(vm.titulo)"
+        width="575px"
+        height="auto"
+        closable="true"
+        action="hide: slideUp"
+        border="normal"
+        mode="modal"
+        apply="org.zkoss.bind.BindComposer"
+        viewModel="@id('vm') @init('app.iva.IvaViewModel')"
+        validationMessages="@id('vmsgs')"  
+        visible="true"   
+    >
+
+    <script type="text/javascript">
+            zk.afterMount(function() {
+                $.mask.definitions['m']='[01]';
+                $.mask.definitions['d']='[0123]';              
+                $.mask.definitions['y']='[2]';
+                jq("$dateFecha").mask("d9-m9-2099");
+            });
+    </script>
+    
+    <style>
+    .z-datebox-input { 
+        visibility: hidden;
+    }
+    </style>
+    <grid form="@id('zk_iva')
+                @load(vm.event)
+                @save(vm.event, before='addOrUpdate') 
+                @validator(vm.ivaValidator)"  >
+        <columns>
+            <column label="" width="100px"/>
+            <column label="Datos de la factura" width="450px"/>
+        </columns>
+        <rows>
+            <row>
+                Fecha:
+                <cell><textbox id="dateFecha"  value="@bind(zk_iva.fechastring)"    constraint="no empty" width="165px" errorMessage="@load(vmsgs.fechaString)" />    
+                      <datebox  onChange="@command('botonFecha' , valor=self.value)" readonly="true" buttonVisible="true"     lenient="false"  width="0px"  />
+                </cell>
+            </row>
+            
+            <row >
+                Tipo:
+                <cell>                     
+                <listbox id="txtPelo" rows="1" mold="select" selectedItem='@bind(zk_iva.tipo)' onSelect="@command('cambiarTipo' , valor=self.selectedItem.value)" height="25px" width="200px" >
+                    <listitem label="Factura A"         value="A" />
+                    <listitem label="Factura B"         value="B" />
+                    <listitem label="Z"                 value="Z" />
+                    <listitem label="Nota de credito"   value="NC" />
+                    <listitem label="Nota de debito"    value="ND" />
+                </listbox>
+                <label style="color:red" value="@load(vmsgs['tipo'])" />
+                </cell>
+            </row>
+            
+            <row >
+                Número:
+                <cell>
+                <intbox id="puesto"  cols="4" format="0000" value="@bind(zk_iva.nro_puesto)"  maxlength="4" width="80px" visible="@bind(vm.facturaZ)" />
+                <label value="-" visible="@bind(vm.facturaZ)" />
+                <intbox id="factura" cols="8" format="00000000" value="@bind(zk_iva.nro_factura)"  maxlength="8" width="115px" errorMessage="@load(vmsgs.factura)"/>
+                </cell>
+            </row>
+            
+
+            <row>
+                Nombre:
+                <cell><bandbox id="txtCliente"  readonly="true"  onOpen="@command('buscarEntidad')" onOK="@command('buscarEntidad')" width="200px"
+                value='@bind(empty vm.personaString ? (empty vm.event.persona ? "Ingresar Cliente" : vm.event.persona) : vm.personaString)'
+                
+                />   
+                <label style="color:red" value="@load(vmsgs['persona'])" />
+                </cell>
+            </row>
+            
+           
+               
+            <row visible="@bind(vm.verIva)" >
+                Neto Gravado:
+                <doublebox id="netogravado" format="$ #,##0.00" cols="25"   maxlength="14" width="200px"/>
+            </row>
+
+            <row visible="@bind(vm.verIva)" >
+                Iva 21%:
+                <doublebox id="iva21" format="$ #,##0.00" cols="25" onFocus="@command('calcularIva')"  maxlength="14" width="200px"/>
+            </row>
+            
+            <row visible="@bind(vm.verIva)" >
+                Iva 27%:
+                <doublebox id="iva27" format="$ #,##0.00" cols="25"  onOK="@command('calcularIva27')" maxlength="14" width="200px"/>
+            </row>
+            
+            <row visible="@bind(vm.verIva)">
+                Iva 10,5%:
+                <doublebox id="iva10" format="$ #,##0.00" cols="25"  onOK="@command('calcularIva10')"  maxlength="14" width="200px"/>
+            </row>
+            
+            <row visible="@bind(vm.verIva)" >
+                No Gravado:
+                <doublebox id="nogravado" format="$ #,##0.00" cols="25"   maxlength="14" width="200px"/>
+            </row>
+            
+            <row visible="@bind(vm.verIva)" >
+                Op. excentas:
+                <doublebox id="excentas" format="$ #,##0.00" cols="25" onFocus="@command('sumarTodo')" maxlength="14" width="200px"/>
+            </row>
+            
+            <row visible="@bind(vm.verIva)" >
+                Retenciones:
+                <doublebox id="retenciones" format="$ #,##0.00" cols="25"  onFocus="@command('sumarTodo')" maxlength="14" width="200px"/>
+            </row>
+               
+           
+            <row visible="@bind(not vm.verIva)" >
+                Con 21%
+                <checkbox checked="@bind(vm.tipoA)"  />
+            </row>
+            
+            <row>
+               
+                <label value="Total:" style="font-weight:bold" />
+                <doublebox id="total" format="$ #,##0.00" cols="25"  maxlength="14" width="200px" onChange="@command('calcularPorTotal')" onFocus="@command('sumarTodo')"  errorMessage="@load(vmsgs.total)"/>
+            </row>
+            
+            <row>
+            <cell colspan="3" style="text-align:center">
+                <vlayout>
+                    <button class="btn btn-primary"  label="Aceptar" onClick="@command('addOrUpdate', cmp=ivaVentana)" onOK="@command('addOrUpdate', cmp=ivaVentana)"  width="100px" height="30px" image="/images/guardar.png" />
+                </vlayout>
+            </cell>
+            </row>
+            
+        </rows>
+    </grid>
+        
+        
+    </window>
+</zk>

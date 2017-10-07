@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?page title="Clinica Veterinaria"?>
+
+<?link href="../css/bootstrap.css" rel="stylesheet" type="text/css"?>
+
+<?link href="../css/fonts.css" rel="stylesheet" type="text/css"?>
+
+
+<?link href="../css/index.css.dsp" rel="stylesheet" type="text/css"?>
+<?link href="../estilos/listbox20h.css" rel="stylesheet" type="text/css"?>
+<?link rel="icon" type="image/x-icon" href="../images/vetico.png"?>
+
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+     
+            
+           
+      <zscript>
+            import org.zkoss.zk.ui.*;
+            import com.clinica.veterinaria.user.*;
+
+            Session s = Sessions.getCurrent();
+            
+            
+            void logout() {
+                s.invalidate();
+                Executions.sendRedirect("../index.zul");
+            }
+
+            if(!UserCredentialManager.getIntance(session).isAuthenticated())
+                Executions.sendRedirect("../index.zul");
+            
+        
+        </zscript>         
+        
+        <include src="../navbar.zul"/> 
+        <hlayout spacing="0" id="main"
+                    apply="org.zkoss.bind.BindComposer"
+                    viewModel="@id('vm') @init('com.clinica.veterinaria.proveedores.ProveedorViewModel')">
+        
+        <zscript>
+            String ruta = "..";
+            boolean proveedores = true;
+            boolean estadisticas = false, clientes = false, mascotas = false, ventas = false, articulos = false, inicio = false, configs = false;
+            
+        </zscript>
+        <include src="../sidebar.zul"/>
+   
+   
+
+        <vlayout spacing="0" hflex="1">  
+                 <!-- INDICE DE ARRIBA -->            
+            <div sclass="breadcrumbs">
+                <div sclass="breadcrumb">
+                    <span sclass="home-truck z-icon-truck"/>
+                    <a label="Proveedores" href="#"/>
+                    <label value="Listado de Proveedores"/>
+                </div>
+                <!-- Search input-->
+                <include src="/content/search.zul"/>
+            </div>
+            
+        <vlayout sclass="page-content" xmlns:n="native" spacing="0">
+
+            <div sclass="page-header">
+                <label value="Proveedores"/>
+                <a label="Busqueda de Proveedores" iconSclass="z-icon-angle-double-right" sclass="subtitle"/>
+            </div>
+        
+        <hlayout>
+        
+        <menubar id="menu" hflex="10" >
+            <menuitem id="add" 
+                      image="../images/nuevo.png" 
+                      label="Nuevo" 
+                      onClick='Executions.createComponents("/proveedores/proveedor-nuevo.zul", null, null)' 
+                      tooltiptext="Nuevo"/>
+            <menuseparator visible="@load(not empty vm.selectedEvent)" />
+            <menuitem id="delete"  
+                      image="../images/delete.png" 
+                      label="Eliminar"  
+                      disabled="@load(empty vm.selectedEvent)"
+                      visible="@load(not empty vm.selectedEvent)"
+                      tooltiptext="Eliminar"
+                      onClick="@command('delete')">
+                
+            </menuitem>
+        </menubar>
+        </hlayout>
+        <hlayout>
+        <listbox id="box" 
+                 mold="paging" 
+                 pageSize="10" 
+                 rows="10" 
+                 multiple="true" 
+                 model="@bind(vm.events)" 
+                 selectedItem="@bind(vm.selectedEvent)" 
+                 emptyMessage="Ningún proveedor encontrado">
+            <listhead>
+                <listheader label="CUIT"         sort="auto(nif)" width="8%"/>
+                <listheader label="Nombre"      sort="auto(nombre)" width="17%"/>
+                <listheader label="Dirección"   sort="auto(direccion)"/>
+                <listheader label="Ciudad"      sort="auto(poblacion.poblacion)"/>
+                <listheader label="Provincia"   sort="auto(provincia.provincia)"/>
+                <listheader label="Teléfono"    sort="auto(telefono)" width="7%" />
+                <listheader label="Celular"  sort="auto(telefono2)" width="7%" />
+                <listheader label="Fax"         sort="auto(fax)"  width="7%" />
+                <listheader label="Email"       sort="auto(email)"/>
+                <listheader label="Contacto"    />
+            </listhead>
+            <auxhead>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCif)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             onCreate="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterNombre)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterDireccion)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterCiudad)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterProvincia)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterTelefono)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterTelefono2)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterFax)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterEmail)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+                <auxheader>
+                    <textbox value="@bind(vm.filterContacto)" 
+                             instant="true" 
+                             onChange="@command('doSearch')" 
+                             width="95%" />
+                </auxheader>
+            </auxhead>
+            <template name="model" var="zk_proveedor">
+                <listitem value="@load(zk_proveedor)" onDoubleClick="@command('modificarProveedor')">
+                    <listcell label="@load(zk_proveedor.nif)" />
+                    <listcell label="@load(zk_proveedor.nombre)" />
+                 
+                    <listcell label="@load(zk_proveedor.direccion)" />
+                    <listcell label="@load(zk_proveedor.poblacion.poblacion)" />
+                    <listcell label="@load(zk_proveedor.provincia.provincia)" />
+                    <listcell label="@load(zk_proveedor.telefono)" />
+                    <listcell label="@load(zk_proveedor.telefono2)" />
+                    <listcell label="@load(zk_proveedor.fax)" />
+                    <listcell label="@load(zk_proveedor.email)" />
+                    <listcell label="@load(zk_proveedor.contacto)" />
+                </listitem>
+            </template>
+        </listbox>
+        </hlayout>
+        </vlayout>
+        </vlayout>
+        </hlayout>
+</zk>

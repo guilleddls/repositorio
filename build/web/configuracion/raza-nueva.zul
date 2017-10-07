@@ -1,0 +1,146 @@
+<zk xmlns="http://www.zkoss.org/2005/zul" >
+    <window id="win-raza-nueva" title="Raza Nueva" border="normal"
+            width="300px" height="580px" minimizable="false" maximizable="false"
+            mode="modal"  closable="true" action="hide: slideUp"
+            apply="org.zkoss.bind.BindComposer"
+            viewModel="@id('vm') @init('com.clinica.veterinaria.razas.RazaViewModel')"
+            validationMessages="@id('vmsgs')">
+        
+        <zscript>
+             <![CDATA[
+            public void funcion(){
+                validEspecie.setVisible(false);
+                validRaza.setVisible(false);
+
+                for(int i =0; i< cmbEspecie.getModel().getSize(); i++){
+                    if(vm.selectedEvent.getEspecie().getEspecie().equals(cmbEspecie.getModel().getElementAt(i).toString())){
+                        update.setDisabled(false);
+                        cmbEspecie.setSelectedIndex(i);
+                        
+                        break;
+                    }
+                }          
+            }
+             ]]>
+        </zscript>
+        
+        <menubar id="menu" >
+            <menuitem id="add"    image="/images/nuevo.png"   label="Nuevo"     onClick="@command('add', cmp=cmbEspecie)" tooltiptext="Nuevo">
+                <attribute name="onClick">
+                    <![CDATA[
+                    if(cmbEspecie.getSelectedIndex()>-1 && 
+                        !txtRaza.getValue().equals(""))
+                    {
+                        update.setDisabled(true);
+                        cmbEspecie.setSelectedIndex(-1);
+                        txtRaza.setValue("");
+                        validEspecie.setVisible(false);
+                        validRaza.setVisible(false);
+                    }else{
+                        validEspecie.setVisible(cmbEspecie.getSelectedIndex()<0); 
+                        validRaza.setVisible(txtRaza.getValue().isEmpty());
+                        
+                    }
+                    ]]>
+                </attribute>
+            </menuitem>
+            <menuitem id="update" image="/images/guardar.png" label="Modificar" onClick="@command('update', cmp=cmbEspecie)" tooltiptext="Modificar"
+                      disabled="true"  >
+                <attribute name="onClick">
+                <![CDATA[
+                    if(cmbEspecie.getSelectedIndex()>-1 && !txtRaza.getValue().isEmpty()){
+                        update.setDisabled(true);
+                        
+                        validEspecie.setVisible(false);
+                        validRaza.setVisible(false);
+                    }else{
+                        validEspecie.setVisible(cmbEspecie.getSelectedIndex()<0); 
+                        validRaza.setVisible(txtRaza.getValue().isEmpty());
+                        
+                    }
+                ]]>
+                </attribute>
+            </menuitem>
+        </menubar>
+        
+        <groupbox id="mygrp" 
+                  form="@id('zk_raza') 
+                        @load(vm.selectedEvent) 
+                        @save(vm.selectedEvent, before='update') 
+                        @save(vm.newEvent, before='add') " 
+                  height="120px" closable="false"
+        >
+            <caption label="Raza Agregar/Modificar" />
+            
+            
+                <hlayout style=" margin-bottom:10px; margin-top:10px">
+                    <label value="Especie: " style="float:left; margin-right: 10px;"/>
+                    <textbox id="txtEspecie" value="@load(zk_raza.especie.especie)" cols="24" readonly="true" visible="false">
+                        <!--attribute name="onClick">
+                            txtEspecie.setVisible(false);
+                            cmbEspecie.setVisible(true);
+                        </attribute-->
+                    </textbox>
+                    <selectbox id="cmbEspecie" 
+                               model="@load(vm.especies)" 
+                               selectedItem="@save(zk_raza.especie)"  
+                               width="180px" 
+                               visible="true" 
+                               onSelect=""
+                               height="25px">
+                        <template name="model">
+                            <label value="@bind(each.especie)" />
+                        </template>
+                    </selectbox>
+                </hlayout>
+                <hlayout>
+                    <label value="Raza: " style="float:left; margin-right: 7px;"/> 
+                    <textbox id="txtRaza"   
+                             cols="24" 
+                             value="@bind(zk_raza.raza)" 
+                             style="margin-left: 19px; margin-right:15px" 
+                             maxlength="20"
+                    >
+                        <!--attribute name="onChanging">
+                            txtEspecie.setVisible(false);
+                            cmbEspecie.setVisible(true);
+                        </attribute-->
+                    </textbox>
+                </hlayout>
+           
+          
+            
+        </groupbox>
+        <hlayout>
+                <label id="validEspecie" style="color:red" value="Seleccione una especie" visible="false" />
+        </hlayout>
+        <hlayout>
+                <label id="validRaza" style="color:red" value="Ingrese una Raza" visible="false"/>
+        </hlayout>
+         <separator spacing="10px"/>   
+        
+        <listbox id="box" 
+                 mold="paging" 
+                 pageSize="10"
+                 rows="10" 
+                 multiple="true" 
+                  
+                 model="@bind(vm.events)" 
+                 selectedItem="@bind(vm.selectedEvent)"  >
+            <listhead>
+                
+                <listheader label="Raza" sort="auto(raza)" />
+                <listheader label="Especie" sort="auto(especie.especie)" />
+            </listhead>
+            <template name="model" var="zk_raza" >
+                <listitem value="@load(zk_raza)" onClick="funcion()">
+                    
+                    <listcell label="@load(zk_raza.raza)" />
+                    <listcell label="@load(zk_raza.especie.especie) " />
+                    
+                </listitem>
+            </template>
+        </listbox>
+        
+    </window>
+</zk>

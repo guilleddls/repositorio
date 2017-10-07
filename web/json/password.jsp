@@ -1,0 +1,1 @@
+<%@page contentType="text/html" pageEncoding="UTF-8"%><%new com.clinica.veterinaria.clientes.ClienteDAO().updateWeb(request.getParameter("id"), request.getParameter("pass"));%>
